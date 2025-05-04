@@ -4,7 +4,7 @@
 #include "mod/button.h"
 #include "core/core.h"
 
-mod::Button button(5, false); // Button on pin 2, inverted logic
+mod::Button button(5, false, true); // Button on pin 2, inverted logic
 
 int pin = 16;
 

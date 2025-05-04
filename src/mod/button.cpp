@@ -3,11 +3,12 @@
 
 namespace mod
 {
-    Button::Button(int pin, bool inverted)
+    Button::Button(int pin, bool inverted, bool bistable)
     {
         this->pin = pin;
         this->inverted = inverted;
         this->state = inverted ? HIGH : LOW; // Initialize state based on inverted logic
+        this->bistable = bistable;
     }
     Button::~Button() {}
 
@@ -18,13 +19,37 @@ namespace mod
 
     void Button::loop()
     {
-        // Serial.print("Button loop state: ");
-        this->state = (digitalRead(this->pin) == LOW) ^ this->inverted;
-        // Serial.println(this->state ? "Pressed" : "Not Pressed");
+        int readValue = digitalRead(pin) ^ inverted; // Read the button state and apply inversion if needed
+
+        if (debounce())
+        {
+            if (bistable)
+            {
+                if (readValue != lastState && readValue == inverted)
+                {
+                    state = !state; // Toggle state
+                    
+                } 
+                lastState = readValue; // Update last state
+            } else{
+                state = readValue;
+            }
+        }
     }
 
     bool Button::isPressed() const
     {
         return state;
+    }
+
+    bool Button::debounce()
+    {
+        unsigned long currentTime = millis();
+        if ((currentTime - lastDebounceTime) > debounceDelay)
+        {
+            lastDebounceTime = currentTime;
+            return true;
+        }
+        return false;
     }
 }

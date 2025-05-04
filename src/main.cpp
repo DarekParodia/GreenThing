@@ -26,6 +26,6 @@ void loop() {
     receiver::loop();
   #endif
   // Uncomment the following line to print the delta time
-  Serial.print("Delta Time: ");
-  Serial.println(core::getDeltaTime());
+  // Serial.print("Delta Time: ");
+  // Serial.println(core::getDeltaTime());
 }
