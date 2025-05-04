@@ -7,21 +7,10 @@
   #include "receiver.h"
 #endif
 
-void calculateDeltaTime() {
-  core::currentLoopTime = millis();
-  core::deltaTime = core::currentLoopTime - core::lastLoopTime;
-
-  // Ensure the loop time is consistent
-  if (core::deltaTime < core::loopTime) {
-    delay(core::loopTime - core::deltaTime);
-  }
-  core::lastLoopTime = millis();
-}
-
 void setup() {
   Serial.begin(115200);
   while (!Serial) ;
-
+  core::setup();
   #ifdef TRANSMITTER
     transmitter::setup();
   #else
@@ -30,14 +19,13 @@ void setup() {
 }
 
 void loop() {
+  core::loop();
   #ifdef TRANSMITTER
     transmitter::loop();
   #else
     receiver::loop();
   #endif
-
-  calculateDeltaTime();
   // Uncomment the following line to print the delta time
   Serial.print("Delta Time: ");
-  Serial.println(core::deltaTime);
+  Serial.println(core::getDeltaTime());
 }

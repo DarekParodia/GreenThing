@@ -29,14 +29,9 @@ namespace receiver
 
     void loop()
     {
-        Serial.println("Current parameters:");
-        // Serial.println(hc12.getParameters());
-        // delay(1000);
-
         button.loop();
         if (button.isPressed())
         {
-            Serial.println("Button pressed");
             digitalWrite(pin, HIGH);
         } else{
             digitalWrite(pin, LOW);

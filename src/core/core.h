@@ -5,11 +5,11 @@
 
 namespace core
 {
-    // Constants
-    const int loopTime = 100; // Delay in milliseconds
+    const int loopTime = 10000; // Delay in microseconds
 
-    // Global variables
-    unsigned long lastLoopTime = 0;
-    unsigned long currentLoopTime = 0;
-    unsigned long deltaTime = 0;
+    void setup();
+    void loop();
+    void addModule(mod::Module *module);
+    void removeModule(mod::Module *module);
+    unsigned long getDeltaTime();
 }
