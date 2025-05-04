@@ -62,8 +62,8 @@ namespace core
     }
     void delayMicroseconds(unsigned long delay)
     {
-        executeTimeouts(delay);
         unsigned long startTime = micros();
+        executeTimeouts(delay);
         while (micros() - startTime < delay)
         {
             // Wait for the specified delay
@@ -71,8 +71,8 @@ namespace core
     }
     void delay(unsigned long delay)
     {
-        executeTimeouts(delay * 1000);
         unsigned long startTime = micros();
+        executeTimeouts(delay * 1000);
         while (micros() - startTime < delay * 1000)
         {
             // Wait for the specified delay
