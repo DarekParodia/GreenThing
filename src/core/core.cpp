@@ -7,7 +7,9 @@ namespace core
     static std::vector<mod::Module *> modules;
     static std::vector<timeout_t *> timeouts;
 
-    const int loopTime = 10000; // Delay in microseconds
+    const int loopTime = 100000; // Delay in microseconds
+    unsigned long loopCount = 0; // Loop count
+    
     unsigned long lastLoopTime = 0;
     unsigned long currentLoopTime = 0;
     unsigned long deltaTime = 0; // Time in microseconds since the last loop
@@ -25,12 +27,17 @@ namespace core
         lastLoopTime = micros();
     }
 
-    void executeTimeouts()
+    void executeTimeouts(int maxExecutionTime = -1)
     {
-        unsigned long currentTime = millis();
+        unsigned long startTime = micros();
         for (auto &timeout : timeouts)
         {
-            if (currentTime - timeout->startTime >= timeout->delay)
+            unsigned long currentTime = micros();
+            if(maxExecutionTime > 0 && (currentTime - startTime) >= static_cast<unsigned long>(maxExecutionTime))
+            {
+                break; // Exit if the maximum execution time is reached
+            }
+            if (currentTime - timeout->startTime * 1000 >= timeout->delay * 1000)
             {
                 timeout->callback(timeout->custom_pointer);
                 timeouts.erase(std::remove(timeouts.begin(), timeouts.end(), timeout), timeouts.end());
@@ -50,6 +57,25 @@ namespace core
         for (auto &module : modules)
         {
             module->loop();
+        }
+        loopCount++;
+    }
+    void delayMicroseconds(unsigned long delay)
+    {
+        executeTimeouts(delay);
+        unsigned long startTime = micros();
+        while (micros() - startTime < delay)
+        {
+            // Wait for the specified delay
+        }
+    }
+    void delay(unsigned long delay)
+    {
+        executeTimeouts(delay * 1000);
+        unsigned long startTime = micros();
+        while (micros() - startTime < delay * 1000)
+        {
+            // Wait for the specified delay
         }
     }
     void addModule(mod::Module *module)

@@ -33,10 +33,6 @@ namespace mod
     void Solenoid::setState(bool state)
     {
         if (isTimeouted) return; // If the timeout is active, do not change the state
-        Serial.print("Solenoid state: ");
-        Serial.print(state);
-        Serial.print(" pin used: ");
-        Serial.println((state ^ inverted) ? pin1 : pin2);
         if (bistable)
         {
             core::timeout_t *timeout = new core::timeout_t();

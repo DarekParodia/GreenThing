@@ -14,8 +14,13 @@ namespace core
     };
     typedef struct timeout_t timeout_t;
 
+    extern const int loopTime; // Delay in microseconds
+    extern unsigned long loopCount; // Loop count
+
     void setup();
     void loop();
+    void delayMicroseconds(unsigned long delay);
+    void delay(unsigned long delay);
     void addModule(mod::Module *module);
     void addTimeout(timeout_t *timeout);
     void removeModule(mod::Module *module);
