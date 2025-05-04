@@ -5,7 +5,7 @@
 
 namespace mod
 {
-    Solenoid(int pin, int pin2 = -1, bool inverted = false, int pulseTime = 100)
+    Solenoid::Solenoid(int pin, int pin2, bool inverted, int pulseTime)
     {
         this->pin1 = pin1;
         this->pin2 = pin2;
@@ -35,21 +35,20 @@ namespace mod
     {
         if (bistable)
         {
-            core::timeout_t timeout(
-                pulseTime,
-                [this]()
-                {
-                    digitalWrite(pin1, LOW);
-                    digitalWrite(pin2, LOW);
-                });
-            core::addTimeout(timeout);
+            core::timeout_t timeout;
+            timeout.delay = pulseTime;
+            timeout.callback = [](void *arg) {
+                auto *solenoid = static_cast<Solenoid *>(arg);
+                solenoid->disableOutputs();
+            };
+            core::addTimeout(&timeout);
             digitalWrite((state ^ inverted) ? pin1 : pin2, HIGH);
         }
         else
         {
             digitalWrite(pin1, state ^ inverted ? HIGH : LOW);
         }
-        isOpen = state;
+        this->state = state;
     }
     void Solenoid::open()
     {
@@ -61,10 +60,18 @@ namespace mod
     }
     void Solenoid::toggle()
     {
-        this->setState(!isOpen);
+        this->setState(!state);
     }
-    bool Solenoid::isOpen() const
+    void Solenoid::disableOutputs()
     {
-        return isOpen;
+        digitalWrite(pin1, LOW);
+        if (bistable)
+        {
+            digitalWrite(pin2, LOW);
+        }
+    }
+    bool Solenoid::isOpen() 
+    {
+        return state;
     }
 }

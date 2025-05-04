@@ -16,16 +16,14 @@ namespace mod
         void open();
         void close();
         void toggle();
-        bool isOpen() const
-        {
-            return isOpen;
-        }
+        void disableOutputs();
+        bool isOpen();
 
     private:
         int pin1 = -1;
         int pin2 = -1;
         bool bistable = false;
-        bool isOpen = false; // State of the solenoid
+        bool state = false; // State of the solenoid
         bool inverted = false; // Inverted logic
         int pulseTime = 100; // Pulse time in milliseconds
     };

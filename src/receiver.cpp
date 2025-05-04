@@ -2,6 +2,7 @@
 #include "receiver.h"
 #include <Arduino.h>
 #include "mod/button.h"
+#include "mod/solenoid.h"
 #include "core/core.h"
 
 mod::Button button(5, false, true); // Button on pin 2, inverted logic

@@ -25,6 +25,19 @@ namespace core
         lastLoopTime = micros();
     }
 
+    void executeTimeouts()
+    {
+        unsigned long currentTime = micros();
+        for (auto &timeout : timeouts)
+        {
+            if (currentTime - timeout->startTime >= timeout->delay)
+            {
+                timeout->callback(timeout->custom_pointer);
+                timeouts.erase(std::remove(timeouts.begin(), timeouts.end(), timeout), timeouts.end());
+            }
+        }
+    }
+
     void setup()
     {
         // todo
@@ -33,6 +46,7 @@ namespace core
     void loop()
     {
         calculateDeltaTime();
+        executeTimeouts();
         for (auto &module : modules)
         {
             module->loop();
