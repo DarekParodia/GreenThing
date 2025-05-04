@@ -1,6 +1,7 @@
 #include "solenoid.h"
 
 #include <Arduino.h>
+#include "core/core.h"
 
 namespace mod
 {
@@ -32,49 +33,35 @@ namespace mod
 
     void Solenoid::setState(bool state)
     {
-        if (state ^ inverted)
+        if (bistable)
         {
-            open();
+            core::timeout_t timeout(
+                pulseTime,
+                [this]()
+                {
+                    digitalWrite(pin1, LOW);
+                    digitalWrite(pin2, LOW);
+                });
+            core::addTimeout(timeout);
+            digitalWrite((state ^ inverted) ? pin1 : pin2, HIGH);
         }
         else
         {
-            close();
+            digitalWrite(pin1, state ^ inverted ? HIGH : LOW);
         }
+        isOpen = state;
     }
     void Solenoid::open()
     {
-        if (bistable)
-        {
-      
-        }
-        else
-        {
-            digitalWrite(pin1, HIGH);
-        }
-        isOpen = true;
+       this->setState(true);
     }
     void Solenoid::close()
     {
-        if (bistable)
-        {
-        
-        }
-        else
-        {
-            digitalWrite(pin1, LOW);
-        }
-        isOpen = false;
+        this->setState(false);
     }
     void Solenoid::toggle()
     {
-        if (isOpen)
-        {
-            close();
-        }
-        else
-        {
-            open();
-        }
+        this->setState(!isOpen);
     }
     bool Solenoid::isOpen() const
     {

@@ -5,7 +5,9 @@
 namespace core
 {
     static std::vector<mod::Module *> modules;
+    static std::vector<timeout_t *> timeouts;
 
+    const int loopTime = 10000; // Delay in microseconds
     unsigned long lastLoopTime = 0;
     unsigned long currentLoopTime = 0;
     unsigned long deltaTime = 0; // Time in microseconds since the last loop
@@ -41,6 +43,13 @@ namespace core
         modules.push_back(module);
         module->init();
     }
+
+    void addTimeout(timeout_t *timeout)
+    {
+        timeouts.push_back(timeout);
+        timeout->startTime = micros();
+    }
+
     void removeModule(mod::Module *module)
     {
         modules.erase(std::remove(modules.begin(), modules.end(), module), modules.end());

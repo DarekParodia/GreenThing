@@ -5,24 +5,27 @@
 #include "core/core.h"
 
 mod::Button button(5, false, true); // Button on pin 2, inverted logic
+mod::Solenoid solenoid(16, 14, false, 100); // Solenoid on pin 2 and 3, not inverted, pulse time 100ms
 
-int pin = 16;
+bool lastState = LOW;
 
 namespace receiver
 {
     void setup()
     {
-        pinMode(pin, OUTPUT);
         core::addModule(&button);
+        core::addModule(&solenoid);
     }
 
     void loop()
     {
         if (button.isPressed())
         {
-            digitalWrite(pin, HIGH);
-        } else{
-            digitalWrite(pin, LOW);
+            if (button.isPressed() != lastState)
+            {
+                lastState = button.isPressed();
+                solenoid.toggle();
+            }
         }
     }
 }
