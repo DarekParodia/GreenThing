@@ -23,6 +23,7 @@ namespace mod
         int pin1 = -1;
         int pin2 = -1;
         bool bistable = false;
+        bool isTimeouted = false; // Flag to check if the timeout is active
         bool state = false; // State of the solenoid
         bool inverted = false; // Inverted logic
         int pulseTime = 100; // Pulse time in millis

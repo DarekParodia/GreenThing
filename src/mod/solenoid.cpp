@@ -7,7 +7,7 @@ namespace mod
 {
     Solenoid::Solenoid(int pin, int pin2, bool inverted, int pulseTime)
     {
-        this->pin1 = pin1;
+        this->pin1 = pin;
         this->pin2 = pin2;
         if (pin2 != -1)
             this->bistable = true;
@@ -32,8 +32,11 @@ namespace mod
 
     void Solenoid::setState(bool state)
     {
+        if (isTimeouted) return; // If the timeout is active, do not change the state
         Serial.print("Solenoid state: ");
-        Serial.println(state);
+        Serial.print(state);
+        Serial.print(" pin used: ");
+        Serial.println((state ^ inverted) ? pin1 : pin2);
         if (bistable)
         {
             core::timeout_t *timeout = new core::timeout_t();
@@ -45,6 +48,7 @@ namespace mod
             };
             timeout->custom_pointer = this; // Pass the current object as custom pointer
             core::addTimeout(timeout);
+            isTimeouted = true; // Set the timeout flag
             digitalWrite((state ^ inverted) ? pin1 : pin2, HIGH);
         }
         else
@@ -55,10 +59,14 @@ namespace mod
     }
     void Solenoid::open()
     {
+        if (state)
+            return;
         this->setState(true);
     }
     void Solenoid::close()
     {
+        if (!state)
+            return;
         this->setState(false);
     }
     void Solenoid::toggle()
@@ -72,6 +80,7 @@ namespace mod
         {
             digitalWrite(pin2, LOW);
         }
+        isTimeouted = false; // Reset the timeout flag
     }
     bool Solenoid::isOpen()
     {

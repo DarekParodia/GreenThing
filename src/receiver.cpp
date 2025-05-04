@@ -5,10 +5,8 @@
 #include "mod/solenoid.h"
 #include "core/core.h"
 
-mod::Button button(5, false, true); // Button on pin 2, inverted logic
-mod::Solenoid solenoid(16, 14, false, 1000); // Solenoid on pin 2 and 3, not inverted, pulse time 100ms
-
-bool lastState = LOW;
+mod::Button button(5, false, true);          // Button on pin 2, inverted logic
+mod::Solenoid solenoid(16, 14, false, 1000); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
 
 namespace receiver
 {
@@ -22,11 +20,11 @@ namespace receiver
     {
         if (button.isPressed())
         {
-            if (button.isPressed() != lastState)
-            {
-                lastState = button.isPressed();
-                solenoid.toggle();
-            }
+            solenoid.open();
+        }
+        else
+        {
+            solenoid.close();
         }
     }
 }
