@@ -8,8 +8,8 @@ namespace core
     struct timeout_t
     {
         unsigned long delay;
+        unsigned long startTime;
         void (*callback)(void *custom_pointer);
-        unsigned long startTime = 0;
         void *custom_pointer = nullptr; // Pointer to custom data
     };
     typedef struct timeout_t timeout_t;

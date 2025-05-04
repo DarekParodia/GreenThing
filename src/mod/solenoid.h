@@ -25,6 +25,6 @@ namespace mod
         bool bistable = false;
         bool state = false; // State of the solenoid
         bool inverted = false; // Inverted logic
-        int pulseTime = 100; // Pulse time in milliseconds
+        int pulseTime = 100; // Pulse time in millis
     };
 }

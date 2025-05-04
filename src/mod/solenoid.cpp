@@ -28,20 +28,23 @@ namespace mod
 
     void Solenoid::loop()
     {
-        
     }
 
     void Solenoid::setState(bool state)
     {
+        Serial.print("Solenoid state: ");
+        Serial.println(state);
         if (bistable)
         {
-            core::timeout_t timeout;
-            timeout.delay = pulseTime;
-            timeout.callback = [](void *arg) {
-                auto *solenoid = static_cast<Solenoid *>(arg);
+            core::timeout_t *timeout = new core::timeout_t();
+            timeout->delay = pulseTime;
+            timeout->callback = [](void *custom_pointer)
+            {
+                auto *solenoid = static_cast<Solenoid *>(custom_pointer);
                 solenoid->disableOutputs();
             };
-            core::addTimeout(&timeout);
+            timeout->custom_pointer = this; // Pass the current object as custom pointer
+            core::addTimeout(timeout);
             digitalWrite((state ^ inverted) ? pin1 : pin2, HIGH);
         }
         else
@@ -52,7 +55,7 @@ namespace mod
     }
     void Solenoid::open()
     {
-       this->setState(true);
+        this->setState(true);
     }
     void Solenoid::close()
     {
@@ -70,7 +73,7 @@ namespace mod
             digitalWrite(pin2, LOW);
         }
     }
-    bool Solenoid::isOpen() 
+    bool Solenoid::isOpen()
     {
         return state;
     }

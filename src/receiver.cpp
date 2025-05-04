@@ -6,7 +6,7 @@
 #include "core/core.h"
 
 mod::Button button(5, false, true); // Button on pin 2, inverted logic
-mod::Solenoid solenoid(16, 14, false, 100); // Solenoid on pin 2 and 3, not inverted, pulse time 100ms
+mod::Solenoid solenoid(16, 14, false, 1000); // Solenoid on pin 2 and 3, not inverted, pulse time 100ms
 
 bool lastState = LOW;
 

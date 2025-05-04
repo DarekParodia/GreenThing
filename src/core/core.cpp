@@ -27,7 +27,7 @@ namespace core
 
     void executeTimeouts()
     {
-        unsigned long currentTime = micros();
+        unsigned long currentTime = millis();
         for (auto &timeout : timeouts)
         {
             if (currentTime - timeout->startTime >= timeout->delay)
@@ -60,8 +60,8 @@ namespace core
 
     void addTimeout(timeout_t *timeout)
     {
+        timeout->startTime = millis();
         timeouts.push_back(timeout);
-        timeout->startTime = micros();
     }
 
     void removeModule(mod::Module *module)
