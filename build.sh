@@ -7,22 +7,33 @@
 # build the project
 # pio run --environment esp8266_tx
 
-if [ $? -ne 0 ]; then
-    echo "Build failed"
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "Build failed"
+#     exit 1
+# fi
 
-pio run --environment esp8266_rx
+# pio run --environment esp8266_rx
 # check if the build was successful
-if [ $? -ne 0 ]; then
-    echo "Build failed"
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "Build failed"
+#     exit 1
+# fi
 
 
 # upload the project
-# pio run --target upload --environment esp8266_tx
+pio run --target upload --environment esp8266_tx
+
+if [ $? -ne 0 ]; then
+    echo "Build failed"
+    exit 1
+fi
+
 pio run --target upload --environment esp8266_rx
+
+if [ $? -ne 0 ]; then
+    echo "Build failed"
+    exit 1
+fi
 
 # enter new tmux instance and monitor pio on tmux split screen, exit after user presses enter
 # tmux new-session -d -s pio_monitor

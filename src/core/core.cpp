@@ -8,6 +8,8 @@ namespace core
     static std::vector<timeout_t *> timeouts;
 
     const int loopTime = 100000; // Delay in microseconds
+    const int loopsPerSecond = 1000000 / core::loopTime; // Number of loops per second
+    const int loopsPerMillisecond = 1000 / core::loopTime; // Number of loops per millisecond
     unsigned long loopCount = 0; // Loop count
     
     unsigned long lastLoopTime = 0;
