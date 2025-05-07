@@ -15,8 +15,8 @@ namespace core
     typedef struct timeout_t timeout_t;
 
     extern const int loopTime; // Delay in microseconds
-    extern const int loopsPerSecond; // Number of loops per second
-    extern const int loopsPerMillisecond; // Number of loops per millisecond
+    extern const double loopsPerSecond; // Number of loops per second
+    extern const double loopsPerMillisecond; // Number of loops per millisecond
     extern unsigned long loopCount; // Loop count
 
     void setup();
