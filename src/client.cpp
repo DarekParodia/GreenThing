@@ -1,5 +1,4 @@
-#ifdef RECEIVER
-#include "receiver.h"
+#include "client.h"
 #include <Arduino.h>
 #include "mod/button.h"
 #include "mod/solenoid.h"
@@ -10,7 +9,7 @@ mod::Solenoid solenoid(16, 14, false, 250); // Solenoid on pin 16 and 14, not in
 
 int ledPin = 2; // Pin for the LED
 int ledState = LOW; // Variable to store the LED state
-namespace receiver
+namespace client
 {
     void setup()
     {
@@ -47,4 +46,3 @@ namespace receiver
         }
     }
 }
-#endif
