@@ -7,10 +7,10 @@ namespace core::api
 {
     enum class DataPointType
     {
-        UNDEFINED,
-        SOLENOID,
-        BUTTON,
-        LED
+        UNDEFINED = 0,
+        SOLENOID = 1,
+        BUTTON = 2,
+        LED = 3
     };
 
     class DataPoint
@@ -19,7 +19,7 @@ namespace core::api
         DataPoint(std::string name) : name(name) {};
         ~DataPoint() = default;
 
-        virtual JsonObject toJSON() = 0;
+        virtual void addToJsonArray(JsonArray& array) = 0;
 
         std::string getName() const { return name; }
         DataPointType getType() const { return type; }

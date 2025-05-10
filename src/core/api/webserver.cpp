@@ -1,5 +1,7 @@
 #include "webserver.h"
 #include "core/api/api.h"
+#include "core/api/datapoint.h"
+#include <vector>
 
 namespace core::api
 {
@@ -8,7 +10,18 @@ namespace core::api
     void handleRoot()
     {
         // Handle the root URL
-        server->send(200, "text/plain", "Hello, world!");
+        std::vector<DataPoint *> dataPoints = core::api::getDataPoints();
+        // Create a JSON object to hold the data points
+        DynamicJsonDocument doc(1024);
+        JsonArray dataPointsArray = doc.createNestedArray("dataPoints");
+        for (auto &dataPoint : dataPoints)
+        {
+            dataPoint->addToJsonArray(dataPointsArray);
+        }
+        std::string jsonString;
+        serializeJson(doc, jsonString);
+        // Send the JSON response
+        server->send(200, "application/json", jsonString.c_str());
     }
     void handleNotFound()
     {

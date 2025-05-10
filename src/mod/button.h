@@ -11,7 +11,7 @@ namespace mod
         Button(std::string name, int pin, bool inverted = false, bool bistable = false);
         ~Button();
 
-        JsonObject toJSON() override;
+        void addToJsonArray(JsonArray& array) override;
 
         void init() override;
         void loop() override;

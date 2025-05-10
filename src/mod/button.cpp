@@ -33,10 +33,11 @@ namespace mod
                 if (readValue != lastState && readValue == inverted)
                 {
                     state = !state; // Toggle state
-                    
-                } 
+                }
                 lastState = readValue; // Update last state
-            } else{
+            }
+            else
+            {
                 state = readValue;
             }
         }
@@ -58,14 +59,15 @@ namespace mod
         return false;
     }
 
-    JsonObject Button::toJSON()
+    void Button::addToJsonArray(JsonArray &array)
     {
         // Create a JSON object to represent the button state
-        StaticJsonDocument<200> doc;
-        JsonObject json = doc.to<JsonObject>();
-        json["name"] = getName();
-        json["type"] = "button";
-        json["state"] = state ? "pressed" : "released";
-        return json;
+        JsonObject obj = array.createNestedObject();
+        obj["name"] = this->name.c_str();
+        obj["type"] = (int) core::api::DataPointType::BUTTON;
+        obj["state"] = state;
+        obj["inverted"] = inverted;
+        obj["bistable"] = bistable;
+        obj["pin"] = pin;
     }
 }
