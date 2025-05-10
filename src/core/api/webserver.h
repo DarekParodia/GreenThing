@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <ESP8266WebServer.h>
 
 namespace core::api
 {
@@ -13,6 +14,6 @@ namespace core::api
         void loop();
 
     private:
-        
+
     };
 }

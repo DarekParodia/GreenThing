@@ -17,7 +17,7 @@ namespace core::api
 {
     unsigned long connectionTimeout = 10000; // 10 seconds
     bool enabled = false;
-    WebServer *server = nullptr;
+    WebServer *webServer = nullptr;
     WiFiManager wifiManager;
 
     bool reconnect()
@@ -120,9 +120,9 @@ namespace core::api
             return;
         }
 
-        if (server)
+        if (webServer)
         {
-            server->loop();
+            webServer->loop();
         }
 
         ArduinoOTA.handle();
@@ -145,8 +145,8 @@ namespace core::api
             return;
         }
 
-        server = new WebServer();
-        server->init();
+        webServer = new WebServer();
+        webServer->init();
         enabled = true;
     }
 
@@ -156,10 +156,10 @@ namespace core::api
             return;
         WiFi.disconnect();
         WiFi.mode(WIFI_OFF);
-        if (server)
+        if (webServer)
         {
-            delete server;
-            server = nullptr;
+            delete webServer;
+            webServer = nullptr;
         }
         enabled = false;
     }
