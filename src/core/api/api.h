@@ -2,6 +2,8 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
+#include "core/api/datapoint.h"
 
 namespace core::api
 {
@@ -13,4 +15,6 @@ namespace core::api
     void loop();
     void enable();
     void disable();
+    void addDataPoint(DataPoint *dataPoint);
+    std::vector<DataPoint *> getDataPoints();
 }

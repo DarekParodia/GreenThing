@@ -27,4 +27,5 @@ namespace core
     void addTimeout(timeout_t *timeout);
     void removeModule(mod::Module *module);
     unsigned long getDeltaTime();
+    std::vector<mod::Module *> getModules();
 }

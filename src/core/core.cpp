@@ -101,4 +101,9 @@ namespace core
     {
         return deltaTime;
     }
+
+    std::vector<mod::Module *> getModules()
+    {
+        return modules;
+    }
 }

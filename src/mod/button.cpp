@@ -1,14 +1,19 @@
 #include "button.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include <string>
+#include "core/api/api.h"
 
 namespace mod
 {
-    Button::Button(int pin, bool inverted, bool bistable)
+    Button::Button(std::string name, int pin, bool inverted, bool bistable) : core::api::DataPoint(name)
     {
         this->pin = pin;
         this->inverted = inverted;
         this->state = inverted ? HIGH : LOW; // Initialize state based on inverted logic
         this->bistable = bistable;
+
+        core::api::addDataPoint(this); // Add this button to the data points
     }
     Button::~Button() {}
 
@@ -51,5 +56,16 @@ namespace mod
             return true;
         }
         return false;
+    }
+
+    JsonObject Button::toJSON()
+    {
+        // Create a JSON object to represent the button state
+        StaticJsonDocument<200> doc;
+        JsonObject json = doc.to<JsonObject>();
+        json["name"] = getName();
+        json["type"] = "button";
+        json["state"] = state ? "pressed" : "released";
+        return json;
     }
 }

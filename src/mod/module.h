@@ -4,9 +4,9 @@ namespace mod {
     class Module {
     public:
         Module() = default;
-        ~Module()= default;
+        virtual ~Module()= default;
         
-        virtual void init();
-        virtual void loop();
+        virtual void init() = 0;
+        virtual void loop() = 0;
     };
 }

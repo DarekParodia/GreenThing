@@ -19,6 +19,7 @@ namespace core::api
     bool enabled = false;
     WebServer *webServer = nullptr;
     WiFiManager wifiManager;
+    std::vector<DataPoint *> dataPoints;
 
     bool reconnect()
     {
@@ -162,5 +163,15 @@ namespace core::api
             webServer = nullptr;
         }
         enabled = false;
+    }
+
+    void addDataPoint(DataPoint *dataPoint)
+    {
+        dataPoints.push_back(dataPoint);
+    }
+
+    std::vector<DataPoint *> getDataPoints()
+    {
+        return dataPoints;
     }
 }
