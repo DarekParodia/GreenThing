@@ -4,7 +4,7 @@
 #include "core/api/api.h"
 namespace mod
 {
-    Led::Led(std::string, int pin, bool inverted, long interval) : core::api::DataPoint(name)
+    Led::Led(std::string name, int pin, bool inverted, long interval) : core::api::DataPoint(name)
     {
         this->pin = pin;
         this->inverted = inverted;
