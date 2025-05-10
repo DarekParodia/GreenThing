@@ -1,12 +1,15 @@
 #pragma once
 #include "module.h"
+#include "core/api/datapoint.h"
+#include <ArduinoJson.h>
+#include <string>
 
 namespace mod
 {
-    class Led : public Module
+    class Led : public Module, public core::api::DataPoint
     {
         public:
-        Led(int pin, bool inverted = false, long interval = -1);
+        Led(std::string name, int pin, bool inverted = false, long interval = -1);
         ~Led();
 
         void init() override;
@@ -16,11 +19,15 @@ namespace mod
         void on();
         void off();
         void setToggleInterval(long interval);
+        void addToJsonArray(JsonArray& array) override;
 
     private:
         int pin = -1; // Pin for the LED
         bool inverted = false; // Inverted logic
         bool state = false; // State of the LED
         long toggleInterval = -1; // Interval for toggling the LED (in milliseconds)
+    
+    protected:
+        core::api::DataPointType type = core::api::DataPointType::LED; // Set the type to LED
     };
 }

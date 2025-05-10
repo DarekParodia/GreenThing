@@ -2,10 +2,11 @@
 
 #include <Arduino.h>
 #include "core/core.h"
+#include "core/api/api.h"
 
 namespace mod
 {
-    Solenoid::Solenoid(int pin, int pin2, bool inverted, int pulseTime)
+    Solenoid::Solenoid(std::string name, int pin, int pin2, bool inverted, int pulseTime) : core::api::DataPoint(name)
     {
         this->pin1 = pin;
         this->pin2 = pin2;
@@ -24,6 +25,7 @@ namespace mod
         {
             pinMode(pin2, OUTPUT);
         }
+        core::api::addDataPoint(this); // Add this solenoid to the data points
     }
 
     void Solenoid::loop()
@@ -81,5 +83,18 @@ namespace mod
     bool Solenoid::isOpen()
     {
         return state;
+    }
+
+    void Solenoid::addToJsonArray(JsonArray &array)
+    {
+        JsonObject solenoidObject = array.add<JsonObject>();
+        solenoidObject["name"] = this->name.c_str();
+        solenoidObject["type"] = (int)this->type;
+        solenoidObject["state"] = state;
+        solenoidObject["pin1"] = pin1;
+        solenoidObject["pin2"] = pin2;
+        solenoidObject["bistable"] = bistable;
+        solenoidObject["inverted"] = inverted;
+        solenoidObject["pulseTime"] = pulseTime;
     }
 }

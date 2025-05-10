@@ -62,9 +62,9 @@ namespace mod
     void Button::addToJsonArray(JsonArray &array)
     {
         // Create a JSON object to represent the button state
-        JsonObject obj = array.createNestedObject();
+        JsonObject obj = array.add<JsonObject>();
         obj["name"] = this->name.c_str();
-        obj["type"] = (int) core::api::DataPointType::BUTTON;
+        obj["type"] = (int)this->type;
         obj["state"] = state;
         obj["inverted"] = inverted;
         obj["bistable"] = bistable;
