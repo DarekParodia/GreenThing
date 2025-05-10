@@ -23,9 +23,10 @@ namespace mod
     {
         if (toggleInterval > 0)
         {
-            if (core::loopCount % (unsigned long)(core::loopsPerMillisecond * (double)toggleInterval) == 0)
+            if (millis() - lastToggleTime >= toggleInterval)
             {
-                toggle(); // Toggle the LED state at the specified interval
+                lastToggleTime = millis(); // Update the last toggle time
+                toggle();               // Toggle the LED state
             }
         }
     }

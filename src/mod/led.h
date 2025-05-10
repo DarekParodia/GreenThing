@@ -26,6 +26,7 @@ namespace mod
         bool inverted = false; // Inverted logic
         bool state = false; // State of the LED
         long toggleInterval = -1; // Interval for toggling the LED (in milliseconds)
+        unsigned long lastToggleTime = 0; // Last time the LED was toggled
     
     protected:
         core::api::DataPointType type = core::api::DataPointType::LED; // Set the type to LED
