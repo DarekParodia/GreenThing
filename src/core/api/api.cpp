@@ -10,40 +10,41 @@
 #else
 #error "Unsupported platform, please use ESP32 or ESP8266"
 #endif
+#include <WiFiManager.h>
 
 namespace core::api
 {
     unsigned long connectionTimeout = 10000; // 10 seconds
-    std::string *ssid = nullptr;
-    std::string *password = nullptr;
     bool enabled = false;
     WebServer *server = nullptr;
+    WiFiManager wifiManager;
 
     bool reconnect()
     {
-        // return if already connected
-        if (WiFi.status() == WL_CONNECTED)
-            return true;
-
-        Serial.println("Connecting to WiFi..");
-
-        WiFi.begin(ssid->c_str(), password->c_str());
-        unsigned long startTime = millis();
-
-        while (WiFi.status() != WL_CONNECTED && (millis() - startTime) < connectionTimeout)
+        if (WiFi.status() != WL_CONNECTED)
         {
-            core::delay(500);
-            Serial.println(".");
-        }
+            Serial.println("WiFi disconnected, trying to reconnect...");
+            wifiManager.autoConnect(hostname.c_str());
 
-        if (WiFi.status() == WL_CONNECTED)
-        {
-            return true;
+            if (WiFi.status() == WL_CONNECTED)
+            {
+                Serial.println("Reconnected to WiFi");
+                Serial.print("IP address: ");
+                Serial.println(WiFi.localIP());
+                Serial.print("MAC address: ");
+                Serial.println(WiFi.macAddress());
+                return true;
+            }
+            else
+            {
+                Serial.println("Failed to reconnect to WiFi");
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
-    void init()
+    void setup()
     {
         enable();
     }
@@ -53,27 +54,14 @@ namespace core::api
         if (!enabled)
             return;
 
-        if (WiFi.status() != WL_CONNECTED)
+        if (!reconnect())
         {
-            Serial.println("WiFi disconnected, trying to reconnect...");
-            if (!reconnect())
-            {
-                Serial.println("Failed to reconnect to WiFi");
-                return;
-            }
-            else
-            {
-                Serial.println("Reconnected to WiFi");
-            }
+            return;
         }
 
         if (server)
         {
             server->loop();
-        }
-        else
-        {
-            Serial.println("Server not initialized");
         }
     }
 
@@ -81,20 +69,18 @@ namespace core::api
     {
         if (enabled)
             return;
-        
+
         WiFi.mode(WIFI_STA);
+        WiFi.forceSleepWake();
+        WiFi.setSleepMode(WIFI_NONE_SLEEP);
+        WiFi.setAutoReconnect(true);
+        WiFi.setAutoConnect(true);
+        WiFi.setHostname(hostname.c_str());
 
         if (!reconnect())
         {
-            Serial.println("Failed to connect to WiFi");
             return;
         }
-
-        Serial.println("Connected to WiFi");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        Serial.print("MAC address: ");
-        Serial.println(WiFi.macAddress());
 
         server = new WebServer();
         server->init();
@@ -109,7 +95,6 @@ namespace core::api
         WiFi.mode(WIFI_OFF);
         if (server)
         {
-            server->stop();
             delete server;
             server = nullptr;
         }

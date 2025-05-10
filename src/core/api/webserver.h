@@ -13,7 +13,6 @@ namespace core::api
         void loop();
 
     private:
-        uint16_t port = 80;
-        std::string *hostname = "GreenThing";
+        
     };
 }
