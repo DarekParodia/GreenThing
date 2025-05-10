@@ -61,7 +61,9 @@ namespace core::api
                 Serial.println("Failed to reconnect to WiFi");
                 return;
             }
-            else>nected to WiFi");
+            else
+            {
+                Serial.println("Reconnected to WiFi");
             }
         }
 
