@@ -17,14 +17,13 @@ namespace core::api
     std::string *ssid = nullptr;
     std::string *password = nullptr;
     bool enabled = false;
-    bool initialized = false;
     WebServer *server = nullptr;
 
-    void reconnect()
+    bool reconnect()
     {
         // return if already connected
         if (WiFi.status() == WL_CONNECTED)
-            return;
+            return true;
 
         Serial.println("Connecting to WiFi..");
 
@@ -39,35 +38,79 @@ namespace core::api
 
         if (WiFi.status() == WL_CONNECTED)
         {
-            Serial.println("Connected to WiFi");
+            return true;
         }
-        else
-        {
-            Serial.println("Failed to connect to WiFi");
-        }
+        return false;
     }
 
     void init()
     {
-        if (initialized)
-            return;
-
-        WiFi.mode(WIFI_STA);
-        reconnect();
-
-
-        initialized = true;
+        enable();
     }
 
     void loop()
     {
+        if (!enabled)
+            return;
+
+        if (WiFi.status() != WL_CONNECTED)
+        {
+            Serial.println("WiFi disconnected, trying to reconnect...");
+            if (!reconnect())
+            {
+                Serial.println("Failed to reconnect to WiFi");
+                return;
+            }
+            else>nected to WiFi");
+            }
+        }
+
+        if (server)
+        {
+            server->loop();
+        }
+        else
+        {
+            Serial.println("Server not initialized");
+        }
     }
 
     void enable()
     {
+        if (enabled)
+            return;
+        
+        WiFi.mode(WIFI_STA);
+
+        if (!reconnect())
+        {
+            Serial.println("Failed to connect to WiFi");
+            return;
+        }
+
+        Serial.println("Connected to WiFi");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        Serial.print("MAC address: ");
+        Serial.println(WiFi.macAddress());
+
+        server = new WebServer();
+        server->init();
+        enabled = true;
     }
 
     void disable()
     {
+        if (!enabled)
+            return;
+        WiFi.disconnect();
+        WiFi.mode(WIFI_OFF);
+        if (server)
+        {
+            server->stop();
+            delete server;
+            server = nullptr;
+        }
+        enabled = false;
     }
 }

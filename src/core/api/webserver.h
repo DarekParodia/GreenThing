@@ -9,6 +9,8 @@ namespace core::api
     public:
         WebServer();
         ~WebServer();
+        void init();
+        void loop();
 
     private:
         uint16_t port = 80;
