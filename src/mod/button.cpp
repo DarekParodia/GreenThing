@@ -70,4 +70,20 @@ namespace mod
         obj["bistable"] = bistable;
         obj["pin"] = pin;
     }
+    void Button::handleGetRequest(const std::string &requestBody)
+    {
+        // Handle GET request to return button state
+        // This is a placeholder for future implementation
+        Serial.println("GET request received for Button");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
+
+    void Button::handlePostRequest(const std::string &requestBody)
+    {
+        // Handle POST request to change button state or settings
+        // This is a placeholder for future implementation
+        Serial.println("POST request received for Button");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
+
 }

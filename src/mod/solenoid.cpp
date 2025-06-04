@@ -97,4 +97,18 @@ namespace mod
         solenoidObject["inverted"] = inverted;
         solenoidObject["pulseTime"] = pulseTime;
     }
+
+    void Solenoid::handleGetRequest(const std::string &requestBody)
+    {
+        // Handle GET request to return solenoid state
+        Serial.println("Handling GET request for Solenoid");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
+
+    void Solenoid::handlePostRequest(const std::string &requestBody)
+    {
+        // Parse the request body to get the new state
+        Serial.println("Handling POST request for Solenoid");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
 }

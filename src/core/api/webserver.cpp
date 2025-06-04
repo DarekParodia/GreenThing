@@ -55,6 +55,8 @@ namespace core::api
         if (server)
         {
             server->handleClient();
+
+            
         }
     }
 }

@@ -20,6 +20,8 @@ namespace mod
         void off();
         void setToggleInterval(long interval);
         void addToJsonArray(JsonArray& array) override;
+        void handleGetRequest(const std::string& requestBody);
+        void handlePostRequest(const std::string& requestBody) override;
 
     private:
         int pin = -1; // Pin for the LED

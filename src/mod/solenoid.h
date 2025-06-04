@@ -22,6 +22,8 @@ namespace mod
         void disableOutputs();
         bool isOpen();
         void addToJsonArray(JsonArray &array) override;
+        void handleGetRequest(const std::string& requestBody);
+        void handlePostRequest(const std::string &requestBody) override;
 
     private:
         int pin1 = -1;

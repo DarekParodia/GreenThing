@@ -12,8 +12,9 @@ namespace core::api
         ~WebServer();
         void init();
         void loop();
+        void registerPath(std::string path, HTTPMethod method, (void (*handler)(const std::string &requestBody)));
 
     private:
-
+        void handleRequest((void (*handler)(const std::string &requestBody)));
     };
 }

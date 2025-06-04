@@ -12,6 +12,8 @@ namespace mod
         ~Button();
 
         void addToJsonArray(JsonArray& array) override;
+        void handleGetRequest(const std::string& requestBody);
+        void handlePostRequest(const std::string& requestBody) override;
 
         void init() override;
         void loop() override;

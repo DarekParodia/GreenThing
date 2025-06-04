@@ -20,6 +20,8 @@ namespace core::api
         ~DataPoint() = default;
 
         virtual void addToJsonArray(JsonArray& array) = 0;
+        virtual void handleGetRequest(const std::string& requestBody) = 0;
+        virtual void handlePostRequest(const std::string& requestBody) = 0;
 
         std::string getName() const { return name; }
         DataPointType getType() const { return type; }

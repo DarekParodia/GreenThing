@@ -63,4 +63,17 @@ namespace mod
         ledObject["inverted"] = inverted;
         ledObject["toggleInterval"] = toggleInterval;
     }
+
+    void Led::handleGetRequest(const std::string &requestBody)
+    {
+        Serial.println("Handling GET request for LED");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
+
+    void Led::handlePostRequest(const std::string &requestBody)
+    {
+        Serial.println("Handling POST request for LED");
+        Serial.println(std::string("Request Body: " + requestBody).c_str());
+    }
+
 }
