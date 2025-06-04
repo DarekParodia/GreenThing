@@ -12,7 +12,9 @@ void setup()
   Serial.println();
   Serial.println("Starting setup...");
   core::setup();
+  #ifdef USE_API
   core::api::setup();
+  #endif
   client::setup();
   Serial.println("Setup complete");
 }
@@ -20,7 +22,9 @@ void setup()
 void loop()
 {
   core::loop();
+  #ifdef USE_API
   core::api::loop();
+  #endif
   client::loop();
   // Uncomment the following line to print the delta time
   // Serial.print("Delta Time: ");
