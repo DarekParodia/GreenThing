@@ -7,7 +7,7 @@ namespace core
     static std::vector<mod::Module *> modules;
     static std::vector<timeout_t *> timeouts;
 
-    const int loopTime = 1000; // Delay in microseconds
+    const int loopTime = 100; // Delay in microseconds
     const double loopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
     const double loopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
     unsigned long loopCount = 0; // Loop count
@@ -15,6 +15,17 @@ namespace core
     unsigned long lastLoopTime = 0;
     unsigned long currentLoopTime = 0;
     unsigned long deltaTime = 0; // Time in microseconds since the last loop
+
+    // user loop
+    const int userLoopTime = 100000; // Delay in microseconds
+    const double userLoopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
+    const double userLoopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
+    unsigned long userLoopCount = 0; // Loop count
+    
+    unsigned long lastUserLoopTime = 0;
+    unsigned long currentUserLoopTime = 0;
+    unsigned long userDeltaTime = 0; // Time in microseconds since the last loop
+
 
     void calculateDeltaTime()
     {
@@ -27,6 +38,12 @@ namespace core
             delayMicroseconds(loopTime - deltaTime);
         }
         lastLoopTime = micros();
+    }
+
+    void calculateUserDeltaTime(){
+        currentUserLoopTime = micros();
+        userDeltaTime = currentUserLoopTime - lastUserLoopTime;
+        lastUserLoopTime = micros();
     }
 
     void executeTimeouts(int maxExecutionTime = -1)
@@ -60,6 +77,17 @@ namespace core
         for (auto &module : modules)
         {
             module->loop();
+        }
+
+        if(micros() >= userLoopTime + lastUserLoopTime)
+            userLoop();
+    }
+    void userLoop(){
+        userLoopCount++;
+        calculateUserDeltaTime();
+        for (auto &module : modules)
+        {
+            module->userLoop();
         }
     }
     void delayMicroseconds(unsigned long delay)

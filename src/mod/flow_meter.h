@@ -10,7 +10,7 @@ namespace mod {
 
             void init() override;
             void loop() override;
-            void userLoop();
+            void userLoop() override;
 
         private:
             std::string name;
@@ -19,6 +19,10 @@ namespace mod {
             int val = 0;
             bool lastState = false;
             unsigned long lastPulseTime = 0;
+
+            // UserLoop
+            unsigned int lastPulsesPerUserLoop = 0;
+            unsigned int currentPulsesPerUserLoop = 0;
 
             void registerPulse();
     };

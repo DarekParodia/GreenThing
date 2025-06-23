@@ -19,8 +19,15 @@ namespace core
     extern const double loopsPerMillisecond; // Number of loops per millisecond
     extern unsigned long loopCount; // Loop count
 
+    // User Loop
+    extern const int userLoopTime; // Delay in microseconds
+    extern const double userLoopsPerSecond; // Number of loops per second
+    extern const double userLoopsPerMillisecond; // Number of loops per millisecond
+    extern unsigned long userLoopCount; // Loop count
+
     void setup();
     void loop();
+    void userLoop();
     void delayMicroseconds(unsigned long delay);
     void delay(unsigned long delay);
     void addModule(mod::Module *module);

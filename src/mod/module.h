@@ -8,16 +8,8 @@ namespace mod {
         
         virtual void init() = 0;
         virtual void loop() = 0;
-        void userLoop() {
+        virtual void userLoop() {
             // To be overriden if needed
-            this->_skipUserLoop = true;
         }
-
-        inline bool skipUserLoop(){
-            return this->_skipUserLoop;
-        }
-
-    private:
-        bool _skipUserLoop = false;
     };
 }

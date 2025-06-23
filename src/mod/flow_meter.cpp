@@ -32,10 +32,12 @@ namespace mod{
     }
 
     void FlowMeter::userLoop(){
-
+        this->lastPulsesPerUserLoop = this->currentPulsesPerUserLoop;
+        this->currentPulsesPerUserLoop = 0;
+        Serial.println(this->lastPulsesPerUserLoop);
     }
 
     void FlowMeter::registerPulse(){
-        Serial.println("Pulse");
+        this->currentPulsesPerUserLoop += 1;
     }
 }
