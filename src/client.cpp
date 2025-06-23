@@ -17,6 +17,7 @@ namespace client
         core::addModule(&button);
         core::addModule(&solenoid);
         core::addModule(&led);
+        core::addModule(&flow_meter);
     }
 
     void loop()

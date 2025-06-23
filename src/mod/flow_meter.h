@@ -5,7 +5,7 @@
 namespace mod {
     class FlowMeter : public Module {
         public:
-            FlowMeter(std::string name, int pin);
+            FlowMeter(std::string name, int pin, int triggerPoint = 512);
             ~FlowMeter();
 
             void init() override;
@@ -15,8 +15,11 @@ namespace mod {
         private:
             std::string name;
             int pin;
-            bool lastState;
-            unsigned int currentPulseCount = 0;
-            unsigned int lastUserLoopPulseCount = 0;
+            int triggerPoint = 512;
+            int val = 0;
+            bool lastState = false;
+            unsigned long lastPulseTime = 0;
+
+            void registerPulse();
     };
 }
