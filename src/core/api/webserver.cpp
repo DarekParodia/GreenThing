@@ -5,7 +5,12 @@
 
 namespace core::api
 {
+
+#if defined(ESP32)
+    WebServer *server = nullptr;
+#elif defined(ESP8266)
     ESP8266WebServer *server = nullptr;
+#endif
 
     void handleRoot()
     {
@@ -20,13 +25,19 @@ namespace core::api
         }
         std::string jsonString;
         serializeJson(doc, jsonString);
-        // Send the JSON response
+// Send the JSON response
+#if defined(ESP32)
+#elif defined(ESP8266)
         server->send(200, "application/json", jsonString.c_str());
+#endif
     }
     void handleNotFound()
     {
-        // Handle not found URL
+// Handle not found URL
+#if defined(ESP32)
+#elif defined(ESP8266)
         server->send(404, "text/plain", "Not found");
+#endif
     }
 
     WebServer::WebServer()
@@ -42,11 +53,15 @@ namespace core::api
     void WebServer::init()
     {
         // Initialize the web server
+#if defined(ESP32)
+
+#elif defined(ESP8266)
         server = new ESP8266WebServer(webserver_port);
         server->on("/", HTTP_GET, handleRoot);
         server->onNotFound(handleNotFound);
         server->begin();
         Serial.println("Web server started");
+#endif
     }
 
     void WebServer::loop()
@@ -54,9 +69,10 @@ namespace core::api
         // Handle client requests
         if (server)
         {
+#if defined(ESP32)
+#elif defined(ESP8266)
             server->handleClient();
-
-            
+#endif
         }
     }
 }

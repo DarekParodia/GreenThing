@@ -50,7 +50,7 @@ namespace core::api
     {
         enable();
 
-        if(!enabled)
+        if (!enabled)
         {
             Serial.println("Failed to enable API");
             return;
@@ -59,7 +59,8 @@ namespace core::api
         // Setup OTA
         ArduinoOTA.setPort(ota_port);
 
-        ArduinoOTA.onStart([]() {
+        ArduinoOTA.onStart([]()
+                           {
             String type;
             if (ArduinoOTA.getCommand() == U_FLASH)
             {
@@ -69,21 +70,20 @@ namespace core::api
             {
                 type = "filesystem";
             }
-            Serial.println("Start updating " + type);
-        });
+            Serial.println("Start updating " + type); });
 
-        ArduinoOTA.onEnd([]() {
+        ArduinoOTA.onEnd([]()
+                         {
             Serial.println("End update");
             Serial.println("Rebooting...");
             delay(1000);
-            ESP.restart();
-        });
+            ESP.restart(); });
 
-        ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-            Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-        });
+        ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
+                              { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
 
-        ArduinoOTA.onError([](ota_error_t error) {
+        ArduinoOTA.onError([](ota_error_t error)
+                           {
             Serial.printf("Error[%u]: ", error);
             if (error == OTA_AUTH_ERROR)
             {
@@ -104,8 +104,7 @@ namespace core::api
             else if (error == OTA_END_ERROR)
             {
                 Serial.println("End Failed");
-            }
-        });
+            } });
 
         ArduinoOTA.begin();
         Serial.println("OTA setup complete");
@@ -135,8 +134,10 @@ namespace core::api
             return;
 
         WiFi.mode(WIFI_STA);
+#if defined(ESP8266)
         WiFi.forceSleepWake();
         WiFi.setSleepMode(WIFI_NONE_SLEEP);
+#endif
         WiFi.setAutoReconnect(true);
         WiFi.setAutoConnect(true);
         WiFi.setHostname(hostname.c_str());

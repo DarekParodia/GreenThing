@@ -1,7 +1,9 @@
 #include <Arduino.h>
 
 #include "core/core.h"
+#ifdef USE_API
 #include "core/api/api.h"
+#endif
 #include "client.h"
 
 void setup()
