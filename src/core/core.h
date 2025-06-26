@@ -18,12 +18,14 @@ namespace core
     extern const double loopsPerSecond; // Number of loops per second
     extern const double loopsPerMillisecond; // Number of loops per millisecond
     extern unsigned long loopCount; // Loop count
+    extern unsigned long deltaTime;
 
     // User Loop
     extern const int userLoopTime; // Delay in microseconds
     extern const double userLoopsPerSecond; // Number of loops per second
     extern const double userLoopsPerMillisecond; // Number of loops per millisecond
     extern unsigned long userLoopCount; // Loop count
+    extern unsigned long userDeltaTime;
 
     void setup();
     void loop();

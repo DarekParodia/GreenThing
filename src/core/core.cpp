@@ -7,7 +7,7 @@ namespace core
     static std::vector<mod::Module *> modules;
     static std::vector<timeout_t *> timeouts;
 
-    const int loopTime = 100; // Delay in microseconds
+    const int loopTime = 500; // Delay in microseconds
     const double loopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
     const double loopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
     unsigned long loopCount = 0; // Loop count
@@ -17,7 +17,7 @@ namespace core
     unsigned long deltaTime = 0; // Time in microseconds since the last loop
 
     // user loop
-    const int userLoopTime = 100000; // Delay in microseconds
+    const int userLoopTime = 1000000; // Delay in microseconds
     const double userLoopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
     const double userLoopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
     unsigned long userLoopCount = 0; // Loop count
