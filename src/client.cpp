@@ -5,6 +5,7 @@
 #include "mod/led.h"
 #include "mod/flow_meter.h"
 #include "mod/humidity.h"
+#include "mod/ultrasonic.h"
 #include "core/core.h"
 
 mod::Button button("button1", 5, true, true);         // Button on pin 2, inverted logic
@@ -12,6 +13,7 @@ mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 a
 mod::Led led("led1", 2, false, 1000);           // LED on pin 13, not inverted, toggle interval 1000ms
 mod::FlowMeter flow_meter("flow_meter1", 2);    // Flow meter on pin 2, default trigger point 512, default frequency per flow factor 5.5
 mod::Humidity humidity("humidity1", 4, true); // Humidity sensor on pin 4
+mod::Ultrasonic ultrasonic("ultrasonic1", 12, 13); // Ultrasonic sensor on pin 12 (trigger) and pin 13 (echo)
 
 namespace client
 {
@@ -22,6 +24,7 @@ namespace client
         core::addModule(&led);
         core::addModule(&flow_meter);
         core::addModule(&humidity);
+        core::addModule(&ultrasonic);
     }
 
     void loop()
