@@ -21,6 +21,15 @@ namespace mod
 
     void Ultrasonic::loop()
     {
+    }
+
+    void Ultrasonic::userLoop()
+    {
+        // User-defined loop logic can be added here
+    }
+
+    double Ultrasonic::getDistance()
+    {
         // Trigger the ultrasonic sensor
         digitalWrite(triggerPin, LOW);
         delayMicroseconds(2);
@@ -33,18 +42,7 @@ namespace mod
 
         // Calculate distance in cm (speed of sound is 343 m/s)
         double distance = (duration * 0.0343) / 2; // Divide by 2 for round trip
-
-        if (distance > 0)
-        {
-
-            Serial.print("Distance: ");
-            Serial.print(distance);
-            Serial.println(" cm");
-        }
-    }
-
-    void Ultrasonic::userLoop()
-    {
-        // User-defined loop logic can be added here
+        
+        return distance;
     }
 }

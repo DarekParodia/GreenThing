@@ -63,5 +63,6 @@
         "bitset": "cpp",
         "regex": "cpp",
         "sstream": "cpp"
-    }
+    },
+    "idf.pythonInstallPath": "/usr/bin/python"
 }

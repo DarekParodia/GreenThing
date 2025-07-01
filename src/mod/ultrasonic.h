@@ -12,6 +12,8 @@ namespace mod {
             void loop() override;
             void userLoop() override;
 
+            virtual double getDistance();
+
         private:
             std::string name;
             int triggerPin;
