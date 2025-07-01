@@ -22,6 +22,7 @@ namespace mod {
             std::string name;
             int sda; // SDA pin
             int scl; // SCL pin
+            bool failed = false; // Flag to indicate if the sensor failed to initialize
 
             RCWL_1X05 *sensor = nullptr; // Initialize pointer to nullptr
     };

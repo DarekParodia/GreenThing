@@ -16,7 +16,15 @@ namespace mod {
     
     void RCWL_1x05::init() {
         Wire.begin(sda, scl); // Initialize I2C with specified SDA and SCL pins
-        this->sensor->begin();
+
+        bool result = this->sensor->begin();
+
+        if(!result) {
+            Serial.println("RCWL_1X05 sensor initialization failed!");
+            this->failed = true; // Set the failed flag
+            return; // Exit if initialization failed
+        }
+
         this->sensor->setMode(RCWL_1X05::triggered); // Set mode to oneShot
         this->sensor->setTemperature(20); // Set default temperature
         this->sensor->setTimeout(200); // Set timeout to 1000 ms
@@ -29,6 +37,10 @@ namespace mod {
     }
 
     void RCWL_1x05::userLoop() {
+        if(this->failed) {
+            // Serial.println("RCWL_1X05 sensor initialization failed, skipping measurement.");
+            return; // Skip measurement if initialization failed
+        }
         unsigned int distance = sensor->read();
         this->distance = (double) distance / 10.0; // Convert mm to cm
 
