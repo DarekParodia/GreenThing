@@ -1,6 +1,8 @@
 #include "client.h"
+
 #include <Arduino.h>
 #include <Wire.h>
+
 #include "mod/button.h"
 #include "mod/solenoid.h"
 #include "mod/led.h"
@@ -8,7 +10,9 @@
 #include "mod/humidity.h"
 #include "mod/ultrasonic.h"
 #include "mod/rcwl_1x05.h"
+
 #include "core/core.h"
+#include "core/time.h"
 #include "core/wifi/wifi.h"
 
 #include <Wire.h>
@@ -65,6 +69,11 @@ namespace client
         else
             lcd.print("Connecting...");
         
-        
+        // Print Current Time
+        lcd.setCursor(15, 0);
+        lcd.print(core::time->getHour(true));
+        // lcd.setCursor(17, 0);
+        lcd.print(':');
+        lcd.print(core::time->getMinute());
     }
 }

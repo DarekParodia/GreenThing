@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/time.h"
 
 #include <Arduino.h>
 
@@ -7,25 +8,27 @@ namespace core
     static std::vector<mod::Module *> modules;
     static std::vector<timeout_t *> timeouts;
 
-    const int loopTime = 500; // Delay in microseconds
-    const double loopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
+    const int loopTime = 500;                                           // Delay in microseconds
+    const double loopsPerSecond = 1000000.0 / (double)core::loopTime;   // Number of loops per second
     const double loopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
-    unsigned long loopCount = 0; // Loop count
-    
+    unsigned long loopCount = 0;                                        // Loop count
+
     unsigned long lastLoopTime = 0;
     unsigned long currentLoopTime = 0;
     unsigned long deltaTime = 0; // Time in microseconds since the last loop
 
     // user loop
-    const int userLoopTime = 1000000; // Delay in microseconds
-    const double userLoopsPerSecond = 1000000.0 / (double)core::loopTime; // Number of loops per second
+    const int userLoopTime = 1000000;                                       // Delay in microseconds
+    const double userLoopsPerSecond = 1000000.0 / (double)core::loopTime;   // Number of loops per second
     const double userLoopsPerMillisecond = 1000.0 / (double)core::loopTime; // Number of loops per millisecond
-    unsigned long userLoopCount = 0; // Loop count
-    
+    unsigned long userLoopCount = 0;                                        // Loop count
+
     unsigned long lastUserLoopTime = 0;
     unsigned long currentUserLoopTime = 0;
     unsigned long userDeltaTime = 0; // Time in microseconds since the last loop
 
+    // Time
+    ESP32Time *time = new ESP32Time(0);
 
     void calculateDeltaTime()
     {
@@ -40,7 +43,8 @@ namespace core
         lastLoopTime = micros();
     }
 
-    void calculateUserDeltaTime(){
+    void calculateUserDeltaTime()
+    {
         currentUserLoopTime = micros();
         userDeltaTime = currentUserLoopTime - lastUserLoopTime;
         lastUserLoopTime = micros();
@@ -52,7 +56,7 @@ namespace core
         for (auto &timeout : timeouts)
         {
             unsigned long currentTime = micros();
-            if(maxExecutionTime > 0 && (currentTime - startTime) >= static_cast<unsigned long>(maxExecutionTime))
+            if (maxExecutionTime > 0 && (currentTime - startTime) >= static_cast<unsigned long>(maxExecutionTime))
             {
                 break; // Exit if the maximum execution time is reached
             }
@@ -66,7 +70,53 @@ namespace core
 
     void setup()
     {
-        // todo
+        // Setup Time.h
+
+        // Extract build date and time
+        const char *date = __DATE__; // e.g. "Jul  3 2025"
+        const char *time = __TIME__; // e.g. "15:24:30"
+
+        // Parse date
+        char monthStr[4];
+        int day, year;
+        sscanf(date, "%3s %d %d", monthStr, &day, &year);
+
+        // Convert month string to number
+        int month;
+        if (!strcmp(monthStr, "Jan"))
+            month = 0;
+        else if (!strcmp(monthStr, "Feb"))
+            month = 1;
+        else if (!strcmp(monthStr, "Mar"))
+            month = 2;
+        else if (!strcmp(monthStr, "Apr"))
+            month = 3;
+        else if (!strcmp(monthStr, "May"))
+            month = 4;
+        else if (!strcmp(monthStr, "Jun"))
+            month = 5;
+        else if (!strcmp(monthStr, "Jul"))
+            month = 6;
+        else if (!strcmp(monthStr, "Aug"))
+            month = 7;
+        else if (!strcmp(monthStr, "Sep"))
+            month = 8;
+        else if (!strcmp(monthStr, "Oct"))
+            month = 9;
+        else if (!strcmp(monthStr, "Nov"))
+            month = 10;
+        else if (!strcmp(monthStr, "Dec"))
+            month = 11;
+        else
+            month = 0; // default fallback
+
+        // Parse time
+        // int hour, min, sec;
+        // sscanf(time, "%d:%d:%d", &hour, &min, &sec);
+        // Disabled because i think that it should be set to midnight
+
+        // Set RTC
+        core::time->setTime(0, 0, 0, day, month, year);
     }
 
     void loop()
@@ -79,10 +129,11 @@ namespace core
             module->loop();
         }
 
-        if(micros() >= userLoopTime + lastUserLoopTime)
+        if (micros() >= userLoopTime + lastUserLoopTime)
             userLoop();
     }
-    void userLoop(){
+    void userLoop()
+    {
         userLoopCount++;
         calculateUserDeltaTime();
         for (auto &module : modules)
