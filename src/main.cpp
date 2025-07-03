@@ -1,8 +1,14 @@
 #include <Arduino.h>
 
 #include "core/core.h"
-#ifdef USE_API
+#if defined(USE_API)
 #include "core/api/api.h"
+#endif
+#if defined(USE_WIFI) or defined(USE_API)
+#ifndef USE_WIFI
+#define USE_WIFI
+#endif
+#include "core/wifi/wifi.h"
 #endif
 #include "client.h"
 
@@ -14,6 +20,9 @@ void setup()
   Serial.println();
   Serial.println("Starting setup...");
   core::setup();
+  #ifdef USE_WIFI
+  core::wifi::setup();
+  #endif
   #ifdef USE_API
   core::api::setup();
   #endif
@@ -24,6 +33,9 @@ void setup()
 void loop()
 {
   core::loop();
+  #ifdef USE_WIFI
+  core::wifi::loop();
+  #endif
   #ifdef USE_API
   core::api::loop();
   #endif

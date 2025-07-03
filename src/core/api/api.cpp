@@ -26,7 +26,7 @@ namespace core::api
         if (WiFi.status() != WL_CONNECTED)
         {
             Serial.println("WiFi disconnected, trying to reconnect...");
-            wifiManager.autoConnect(hostname.c_str());
+            wifiManager.autoConnect(HOSTNAME);
 
             if (WiFi.status() == WL_CONNECTED)
             {
@@ -140,7 +140,7 @@ namespace core::api
 #endif
         WiFi.setAutoReconnect(true);
         WiFi.setAutoConnect(true);
-        WiFi.setHostname(hostname.c_str());
+        WiFi.setHostname(HOSTNAME);
 
         if (!reconnect())
         {
