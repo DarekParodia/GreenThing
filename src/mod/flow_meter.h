@@ -12,6 +12,14 @@ namespace mod {
             void loop() override;
             void userLoop() override;
 
+            inline double getFlowRate(){
+                return userLoopFlowRate;
+            }
+
+            inline double getVolume(){
+                return userLoopVolume;
+            }
+
         private:
             std::string name;
             int pin;

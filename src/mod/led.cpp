@@ -56,7 +56,7 @@ namespace mod
     void Led::addToJsonArray(JsonArray &array)
     {
         JsonObject ledObject = array.add<JsonObject>();
-        ledObject["name"] = this->name.c_str();
+        // ledObject["name"] = this->name.c_str();
         ledObject["type"] = (int)this->type;
         ledObject["state"] = state;
         ledObject["pin"] = pin;

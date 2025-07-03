@@ -12,6 +12,10 @@
 #endif
 #include "client.h"
 
+// user loop TEMPORARY SOLUTION
+const int userLoopTime = 1000000; // Delay in microseconds
+unsigned long lastUserLoopTime = 0;
+
 void setup()
 {
   Serial.begin(115200);
@@ -20,12 +24,12 @@ void setup()
   Serial.println();
   Serial.println("Starting setup...");
   core::setup();
-  #ifdef USE_WIFI
+#ifdef USE_WIFI
   core::wifi::setup();
-  #endif
-  #ifdef USE_API
+#endif
+#ifdef USE_API
   core::api::setup();
-  #endif
+#endif
   client::setup();
   Serial.println("Setup complete");
 }
@@ -33,14 +37,18 @@ void setup()
 void loop()
 {
   core::loop();
-  #ifdef USE_WIFI
+#ifdef USE_WIFI
   core::wifi::loop();
-  #endif
-  #ifdef USE_API
+#endif
+#ifdef USE_API
   core::api::loop();
-  #endif
+#endif
   client::loop();
   // Uncomment the following line to print the delta time
   // Serial.print("Delta Time: ");
   // Serial.println(core::getDeltaTime());
+  if (micros() >= userLoopTime + lastUserLoopTime){
+    client::userLoop();
+    lastUserLoopTime = micros();
+  }
 }

@@ -152,7 +152,9 @@ namespace core
         executeTimeouts();
         for (auto &module : modules)
         {
+            unsigned long loopStart = micros();
             module->loop();
+            module->loopDelta = micros() - loopStart;
         }
 
         if (micros() >= userLoopTime + lastUserLoopTime)
@@ -165,7 +167,11 @@ namespace core
         for (auto &module : modules)
         {
             module->userLoop();
+            // Serial.print(module->getName().c_str());
+            // Serial.printf(": %d us|", module->loopDelta);
         }
+        // Serial.println("");
+
     }
     void delayMicroseconds(unsigned long delay)
     {

@@ -3,4 +3,5 @@
 namespace client {
     void setup();
     void loop();
+    void userLoop();
 };

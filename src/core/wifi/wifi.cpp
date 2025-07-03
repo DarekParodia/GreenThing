@@ -38,11 +38,12 @@ namespace core::wifi
         {
             Serial.println("Connected to WiFi: " + WiFi.SSID());
         }
+        wifiManager.process();
     }
 
     void loop()
     {
-        wifiManager.process();
+        // wifiManager.process();
     }
 
     bool isConnected()

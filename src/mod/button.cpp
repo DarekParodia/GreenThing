@@ -63,7 +63,7 @@ namespace mod
     {
         // Create a JSON object to represent the button state
         JsonObject obj = array.add<JsonObject>();
-        obj["name"] = this->name.c_str();
+        // obj["name"] = this->name.c_str();
         obj["type"] = (int)this->type;
         obj["state"] = state;
         obj["inverted"] = inverted;

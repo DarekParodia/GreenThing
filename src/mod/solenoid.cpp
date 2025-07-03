@@ -88,7 +88,7 @@ namespace mod
     void Solenoid::addToJsonArray(JsonArray &array)
     {
         JsonObject solenoidObject = array.add<JsonObject>();
-        solenoidObject["name"] = this->name.c_str();
+        // solenoidObject["name"] = this->name.c_str();
         solenoidObject["type"] = (int)this->type;
         solenoidObject["state"] = state;
         solenoidObject["pin1"] = pin1;
