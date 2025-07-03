@@ -1,5 +1,6 @@
 #include "core/core.h"
 #include "core/time.h"
+#include "core/wifi/wifi.h"
 
 #include <Arduino.h>
 
@@ -28,7 +29,31 @@ namespace core
     unsigned long userDeltaTime = 0; // Time in microseconds since the last loop
 
     // Time
+    const char *ntpServer = "pool.ntp.org";
+    const long gmtOffset_sec = 3600; // Adjust as needed
+    const int daylightOffset_sec = 0;
+    const char *timezone = "CET-1CEST,M3.5.0/2,M10.5.0/3"; // Central European Time
+
     ESP32Time *time = new ESP32Time(0);
+
+    bool syncNTP()
+    {
+        if(!core::wifi::isConnected()) return false;
+
+        // configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+        configTzTime(timezone, ntpServer);
+
+        Serial.println("Attempting NTP sync...");
+        struct tm timeinfo;
+        if (getLocalTime(&timeinfo))
+        {
+            core::time->setTimeStruct(timeinfo);
+            Serial.println("Time synced via NTP.");
+            return true;
+        }
+        Serial.println("Failed to sync time via NTP.");
+        return false;
+    }
 
     void calculateDeltaTime()
     {
@@ -71,8 +96,6 @@ namespace core
     void setup()
     {
         // Setup Time.h
-
-        // Extract build date and time
         const char *date = __DATE__; // e.g. "Jul  3 2025"
         const char *time = __TIME__; // e.g. "15:24:30"
 
@@ -117,6 +140,9 @@ namespace core
 
         // Set RTC
         core::time->setTime(0, 0, 0, day, month, year);
+
+        // Setup NTP
+        syncNTP();
     }
 
     void loop()

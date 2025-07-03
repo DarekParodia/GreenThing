@@ -1,4 +1,5 @@
 #include "wifi.h"
+#include "core/time.h"
 
 #include <Arduino.h>
 
@@ -11,6 +12,7 @@ namespace core::wifi
         Serial.println("WiFi connected!");
         Serial.print("IP address: ");
         Serial.println(WiFi.localIP());
+        core::syncNTP();
     }
 
     void setup()
