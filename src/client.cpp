@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <string>
 
 #include "mod/button.h"
 #include "mod/solenoid.h"
@@ -70,10 +71,16 @@ namespace client
             lcd.print("Connecting...");
         
         // Print Current Time
+        int hour = core::time->getHour(true);
+        int minute = core::time->getMinute();
+
+        std::string hour_s = hour < 10 ? "0" + std::to_string(hour) : std::to_string(hour);
+        std::string minute_s = minute < 10 ? "0" + std::to_string(minute) : std::to_string(minute);
+
         lcd.setCursor(15, 0);
-        lcd.print(core::time->getHour(true));
+        lcd.print(hour_s.c_str());
         // lcd.setCursor(17, 0);
         lcd.print(':');
-        lcd.print(core::time->getMinute());
+        lcd.print(minute_s.c_str());
     }
 }
