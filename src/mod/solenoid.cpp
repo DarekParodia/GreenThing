@@ -26,6 +26,7 @@ namespace mod
             pinMode(pin2, OUTPUT);
         }
         core::api::addDataPoint(this); // Add this solenoid to the data points
+        this->setState(false);
     }
 
     void Solenoid::loop()

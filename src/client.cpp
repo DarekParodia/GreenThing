@@ -103,6 +103,20 @@ namespace client
         lcd.printf("F:%.1f", flow_meter.getFlowRate());
         lcd.write(0);
         lcd.print("   ");
-        lcd.moveCursorLeft(3U);
+        lcd.moveCursorLeft(2U);
+
+        // Print Volume Data
+        lcd.printf("V:%.1fL", flow_meter.getVolume());
+        
+
+        // Print Solenoid
+        lcd.setCursor(0, 3);
+        lcd.print("Zawor: ");
+        if(solenoid.isOpen()){
+            lcd.print("Wl ");
+        } else {
+            lcd.print("Wyl");
+        }
+
     }
 }
