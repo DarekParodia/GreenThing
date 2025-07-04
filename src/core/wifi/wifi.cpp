@@ -43,7 +43,7 @@ namespace core::wifi
 
     void loop()
     {
-        // wifiManager.process();
+        wifiManager.process();
     }
 
     bool isConnected()

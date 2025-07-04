@@ -44,19 +44,19 @@ namespace mod{
         this->userLoopVolume = this->volume;
         this->volume = 0.0; // Reset volume for the next user loop
 
-        Serial.print("Pulses: ");
-        Serial.print(this->lastPulsesPerUserLoop);
-        Serial.print(" | Frequency: ");
-        Serial.print(this->userLoopFrequency);
-        Serial.print(" Hz | Flow Rate: ");
-        Serial.print(this->userLoopFlowRate);
-        Serial.print(" L/min | Volume: ");
-        Serial.print(this->userLoopVolume);
-        Serial.print(" L | Time: ");
-        Serial.print(core::userDeltaTime / 1000.0);
-        Serial.print(" ms | Loop Time: ");
-        Serial.print(core::deltaTime / 1000.0);
-        Serial.println(" ms");
+        // Serial.print("Pulses: ");
+        // Serial.print(this->lastPulsesPerUserLoop);
+        // Serial.print(" | Frequency: ");
+        // Serial.print(this->userLoopFrequency);
+        // Serial.print(" Hz | Flow Rate: ");
+        // Serial.print(this->userLoopFlowRate);
+        // Serial.print(" L/min | Volume: ");
+        // Serial.print(this->userLoopVolume);
+        // Serial.print(" L | Time: ");
+        // Serial.print(core::userDeltaTime / 1000.0);
+        // Serial.print(" ms | Loop Time: ");
+        // Serial.print(core::deltaTime / 1000.0);
+        // Serial.println(" ms");
     }
 
     void FlowMeter::registerPulse(){
@@ -73,7 +73,13 @@ namespace mod{
         unsigned long timeDiff = currentTime - this->lastPulseTime;
         this->freq = 1000000.0 / timeDiff; // Frequency in hertz
         this->flowRate = (this->freq / this->freqPerFlowFactor); // Flow rate in liters per minute
-        this->volume += (this->flowRate * (timeDiff / 60000000.0)); // Volume in liters 
+
+        double tempVol = (this->flowRate * (timeDiff / 60000000.0)); // Volume in liters 
+        this->volume += tempVol;
+
+        for(int i = 0; i < this->volumeMeasurments.size(); i++){
+            *volumeMeasurments[i] += tempVol;
+        }
 
         this->lastPulseTime = currentTime;
     }

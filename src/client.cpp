@@ -21,7 +21,7 @@
 
 I2C_LCD lcd(39);
 
-mod::Button button("button1", 5, true, true);            // Button on pin 2, inverted logic
+mod::Button button("button1", 5, false, true);            // Button on pin 2, inverted logic
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
 mod::Led led("led1", 2, false, 1000);                    // LED on pin 13, not inverted, toggle interval 1000ms
 mod::FlowMeter flow_meter("flow_meter1", 32);            // Flow meter on pin 2, default trigger point 512, default frequency per flow factor 5.5
@@ -38,6 +38,19 @@ byte char_litersPerMinute[] = {
     B01010,
     B10101,
     B10001};
+
+bool prevButton = false;
+int currentVolMeasurment = -1;
+double currentVolume = 0.0;
+
+void wateringCycleOn(){
+    currentVolume = 0.0;
+    solenoid.open();
+}
+
+void wateringCycleOff(){
+    solenoid.close();
+}
 
 namespace client
 {
@@ -57,22 +70,20 @@ namespace client
         lcd.backlight();
 
         lcd.createChar(0, char_litersPerMinute);
+
+        currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
     }
 
     void loop()
     {
-        if (button.isPressed())
-        {
-            solenoid.open();
-        }
-        else
-        {
-            solenoid.close();
-        }
+        if(button.isPressed() != prevButton){
+            prevButton = button.isPressed();
 
-        if (solenoid.isOpen())
-        {
-            led.on();
+            if(button.isPressed()){
+                wateringCycleOn();
+            } else{
+                wateringCycleOff();
+            }
         }
     }
 
@@ -106,7 +117,7 @@ namespace client
         lcd.moveCursorLeft(2U);
 
         // Print Volume Data
-        lcd.printf("V:%.1fL", flow_meter.getVolume());
+        lcd.printf("V:%.1fL", currentVolume);
         
 
         // Print Solenoid

@@ -1,7 +1,7 @@
 #pragma once
 #include "module.h"
 #include <string>
-
+#include <vector>
 namespace mod {
     class FlowMeter : public Module {
         public:
@@ -18,6 +18,11 @@ namespace mod {
 
             inline double getVolume(){
                 return userLoopVolume;
+            }
+
+            inline int startVolumeMeasurment(double *vol){
+                volumeMeasurments.push_back(vol);
+                return volumeMeasurments.size() - 1;
             }
 
         private:
@@ -43,6 +48,9 @@ namespace mod {
             double volume = 0.0; // Volume in liters (per last user loop)
             double flowRate = 0.0; // Flow rate in liters per minute (L/min)
             unsigned long lastPulseTime = 0; // Time of the last pulse in microseconds
+
+            // Custom Measurments
+            std::vector<double *> volumeMeasurments; 
 
             void registerPulse();
     };
