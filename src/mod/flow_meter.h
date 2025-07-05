@@ -5,7 +5,8 @@
 namespace mod {
     class FlowMeter : public Module {
         public:
-            FlowMeter(std::string name, int pin, int triggerPoint = 512, double freqPerFlowFactor = 5.5);
+            FlowMeter(std::string name, int pin, int triggerPoint, double freqPerFlowFactor = 5.5);
+            FlowMeter(std::string name, int pin, double freqPerFlowFactor = 5.5);
             ~FlowMeter();
 
             void init() override;
@@ -33,6 +34,7 @@ namespace mod {
             int triggerPoint = 512;
             int val = 0;
             bool lastState = false;
+            bool digital = false;
 
             // UserLoop
             unsigned int currentPulsesPerUserLoop = 0;

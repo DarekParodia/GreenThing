@@ -8,6 +8,14 @@ namespace mod{
         this->pin = pin;
         this->triggerPoint = triggerPoint;
         this->freqPerFlowFactor = freqPerFlowFactor;
+        this->digital = false;
+    }
+
+    FlowMeter::FlowMeter(std::string name, int pin, double freqPerFlowFactor){
+        this->name = name;
+        this->pin = pin;
+        this->freqPerFlowFactor = freqPerFlowFactor;
+        this->digital = true;
     }
 
     FlowMeter::~FlowMeter(){
@@ -15,23 +23,43 @@ namespace mod{
     }
 
     void FlowMeter::init(){
-        pinMode(this->pin, INPUT);
+        if(!this->digital)
+            pinMode(this->pin, INPUT);
+        else
+            pinMode(this->pin, INPUT_PULLUP);
     }
 
     void FlowMeter::loop(){ 
-        this->val = analogRead(this->pin);
-        bool currentState = false;
-
-        if (this->val >= this->triggerPoint) currentState = true;
-
-        if (this->lastState != currentState){
-            if(!currentState && this->lastState){  
-                this->registerPulse();
-                // Serial.print("pulse ");
-                // Serial.println(millis());
+        if(!digital){
+            this->val = analogRead(this->pin);
+            bool currentState = false;
+    
+            if (this->val >= this->triggerPoint) currentState = true;
+    
+            if (this->lastState != currentState){
+                if(!currentState && this->lastState){  
+                    this->registerPulse();
+                    // Serial.print("pulse ");
+                    // Serial.println(millis());
+                }
+    
+                this->lastState = currentState;
             }
-
-            this->lastState = currentState;
+        }
+        else{
+            bool currentState = digitalRead(this->pin) == LOW ? 1 : 0;
+            // Serial.print("State: ");
+            // Serial.println(digitalRead(this->pin) );
+    
+            if (this->lastState != currentState){
+                if(!currentState && this->lastState){  
+                    this->registerPulse();
+                    // Serial.print("pulse ");
+                    // Serial.println(millis());
+                }
+    
+                this->lastState = currentState;
+            }
         }
     }
 

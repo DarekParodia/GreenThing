@@ -21,13 +21,16 @@
 
 I2C_LCD lcd(39);
 
-mod::Button button("button1", 5, false, true);            // Button on pin 2, inverted logic
+mod::Button button("button1", 0, false, true);            // Button on pin 2, inverted logic
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
-mod::Led led("led1", 2, false, 1000);                    // LED on pin 13, not inverted, toggle interval 1000ms
-mod::FlowMeter flow_meter("flow_meter1", 32);            // Flow meter on pin 2, default trigger point 512, default frequency per flow factor 5.5
-// mod::Humidity humidity("humidity1", 4, true);            // Humidity sensor on pin 4
+// mod::Led led("led1", 13, false, 1000);                    // LED on pin 13, not inverted, toggle interval 1000ms
+// mod::FlowMeter flow_meter("flow_meter1", A0, 512, 5.5);            // Flow meter on pin 2, default trigger point 512, default frequency per flow factor 5.5
+
+mod::FlowMeter flow_meter("flow_meter1", 13);            
+
+mod::Humidity humidity("humidity1", A0, true);            // Humidity sensor on pin 4
 // mod::Ultrasonic ultrasonic("ultrasonic1", 12, 13); // Ultrasonic sensor on pin 12 (trigger) and pin 13 (echo)
-// mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05", 21, 22); // RCWL-1X05 ultrasonic sensor on SDA pin 21 and SCL pin 22
+mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05", 21, 22); // RCWL-1X05 ultrasonic sensor on SDA pin 21 and SCL pin 22
 
 byte char_litersPerMinute[] = {
     B01000,
@@ -56,11 +59,11 @@ namespace client
 {
     void setup()
     {
-        Wire.begin(21, 22);
+        Wire.begin(4, 5);
 
         core::addModule(&button);
         core::addModule(&solenoid);
-        core::addModule(&led);
+        // core::addModule(&led);
         core::addModule(&flow_meter);
         // core::addModule(&humidity);
         // core::addModule(ultrasonic);
@@ -72,6 +75,7 @@ namespace client
         lcd.createChar(0, char_litersPerMinute);
 
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
+        wateringCycleOff();
     }
 
     void loop()
@@ -117,7 +121,7 @@ namespace client
         lcd.moveCursorLeft(2U);
 
         // Print Volume Data
-        lcd.printf("V:%.1fL", currentVolume);
+        lcd.printf("V:%.1fL  ", currentVolume);
         
 
         // Print Solenoid
