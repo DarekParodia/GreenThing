@@ -12,6 +12,10 @@ namespace mod {
             void loop() override;
             void userLoop() override;
 
+            inline double getHumidity(){
+                return humidity;
+            }
+
         private:
             std::string name;
             int pin;

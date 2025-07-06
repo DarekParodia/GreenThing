@@ -28,9 +28,9 @@ mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 a
 
 mod::FlowMeter flow_meter("flow_meter1", 13);            
 
-mod::Humidity humidity("humidity1", A0, true);            // Humidity sensor on pin 4
+mod::Humidity humidity("humidity1", A0, true, 0, 1024);            // Humidity sensor on pin 4
 // mod::Ultrasonic ultrasonic("ultrasonic1", 12, 13); // Ultrasonic sensor on pin 12 (trigger) and pin 13 (echo)
-mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05", 21, 22); // RCWL-1X05 ultrasonic sensor on SDA pin 21 and SCL pin 22
+mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); // RCWL-1X05 ultrasonic sensor uses default I2C bus
 
 byte char_litersPerMinute[] = {
     B01000,
@@ -60,13 +60,14 @@ namespace client
     void setup()
     {
         Wire.begin(4, 5);
+        Wire.setClock(10000);
 
         core::addModule(&button);
         core::addModule(&solenoid);
         // core::addModule(&led);
         core::addModule(&flow_meter);
-        // core::addModule(&humidity);
-        // core::addModule(ultrasonic);
+        core::addModule(&humidity);
+        core::addModule(ultrasonic);
 
         lcd.begin(20, 4);
         lcd.clear();
@@ -76,6 +77,8 @@ namespace client
 
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
         wateringCycleOff();
+
+        Wire.setClock(10000);
     }
 
     void loop()
@@ -93,7 +96,9 @@ namespace client
 
     void userLoop()
     {
+        // lcd.clear();
         // Display IP
+        lcd.flush();
         lcd.setCursor(0, 0);
         if (core::wifi::isConnected())
             lcd.print(core::wifi::getStringIP().c_str());
@@ -115,17 +120,37 @@ namespace client
 
         // Print Flow Data
         lcd.setCursor(0, 1);
+        lcd.flush();
         lcd.printf("F:%.1f", flow_meter.getFlowRate());
         lcd.write(0);
         lcd.print("   ");
-        lcd.moveCursorLeft(2U);
+        // lcd.moveCursorLeft(2U);
 
         // Print Volume Data
-        lcd.printf("V:%.1fL  ", currentVolume);
-        
+        lcd.setCursor(10, 1);
+        lcd.flush();
+        lcd.printf("V:%.1fL", currentVolume);
+        lcd.print("   ");
+        // lcd.moveCursorLeft(2U);
+
+        // Print Ground Humidity
+        lcd.setCursor(0, 2);
+        lcd.flush();
+        lcd.printf("HG:%.1f", humidity.getHumidity());
+        lcd.print('%');
+        lcd.print(' ');
+        lcd.print(' ');
+        // lcd.moveCursorLeft(2U);
+
+        // Print Ultrasonic
+        lcd.setCursor(10, 2);
+        lcd.flush();
+        lcd.printf("D:%.2fcm", ultrasonic->getDistance());
+        lcd.print("   ");
 
         // Print Solenoid
         lcd.setCursor(0, 3);
+        lcd.flush();
         lcd.print("Zawor: ");
         if(solenoid.isOpen()){
             lcd.print("Wl ");
