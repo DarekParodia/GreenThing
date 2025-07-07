@@ -15,11 +15,12 @@
 #include "core/core.h"
 #include "core/time.h"
 #include "core/wifi/wifi.h"
+#include "core/display/
 
 #include <Wire.h>
 #include "I2C_LCD.h"
 
-I2C_LCD lcd(39);
+// I2C_LCD lcd(39);
 
 mod::Button button("button1", 0, false, true);            // Button on pin 2, inverted logic
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
@@ -32,15 +33,15 @@ mod::Humidity humidity("humidity1", A0, true, 0, 1024);            // Humidity s
 // mod::Ultrasonic ultrasonic("ultrasonic1", 12, 13); // Ultrasonic sensor on pin 12 (trigger) and pin 13 (echo)
 mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); // RCWL-1X05 ultrasonic sensor uses default I2C bus
 
-byte char_litersPerMinute[] = {
-    B01000,
-    B01000,
-    B01000,
-    B01110,
-    B00000,
-    B01010,
-    B10101,
-    B10001};
+// byte char_litersPerMinute[] = {
+//     B01000,
+//     B01000,
+//     B01000,
+//     B01110,
+//     B00000,
+//     B01010,
+//     B10101,
+//     B10001};
 
 bool prevButton = false;
 int currentVolMeasurment = -1;
@@ -66,14 +67,14 @@ namespace client
         core::addModule(&solenoid);
         // core::addModule(&led);
         core::addModule(&flow_meter);
-        core::addModule(&humidity);
+        // core::addModule(&humidity);
         core::addModule(ultrasonic);
 
-        lcd.begin(20, 4);
-        lcd.clear();
-        lcd.backlight();
+        // lcd.begin(20, 4);
+        // lcd.clear();
+        // lcd.backlight();
 
-        lcd.createChar(0, char_litersPerMinute);
+        // lcd.createChar(0, char_litersPerMinute);
 
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
         wateringCycleOff();
@@ -96,67 +97,62 @@ namespace client
 
     void userLoop()
     {
-        // lcd.clear();
-        // Display IP
-        lcd.flush();
-        lcd.setCursor(0, 0);
-        if (core::wifi::isConnected())
-            lcd.print(core::wifi::getStringIP().c_str());
-        else
-            lcd.print("Connecting...");
+        // // lcd.clear();
+        // // Display IP
+        // // lcd.flush();
+        // lcd.setCursor(0, 0);
+        // if (core::wifi::isConnected())
+        //     lcd.print(core::wifi::getStringIP().c_str());
+        // else
+        //     lcd.print("Connecting...");
 
-        // Print Current Time
-        int hour = core::time->getHour(true);
-        int minute = core::time->getMinute();
+        // // Print Current Time
+        // int hour = core::time->getHour(true);
+        // int minute = core::time->getMinute();
 
-        std::string hour_s = hour < 10 ? "0" + std::to_string(hour) : std::to_string(hour);
-        std::string minute_s = minute < 10 ? "0" + std::to_string(minute) : std::to_string(minute);
+        // std::string hour_s = hour < 10 ? "0" + std::to_string(hour) : std::to_string(hour);
+        // std::string minute_s = minute < 10 ? "0" + std::to_string(minute) : std::to_string(minute);
 
-        lcd.setCursor(15, 0);
-        lcd.print(hour_s.c_str());
-        // lcd.setCursor(17, 0);
-        lcd.print(':');
-        lcd.print(minute_s.c_str());
+        // lcd.setCursor(15, 0);
+        // lcd.print(hour_s.c_str());
+        // // lcd.setCursor(17, 0);
+        // lcd.print(':');
+        // lcd.print(minute_s.c_str());
 
-        // Print Flow Data
-        lcd.setCursor(0, 1);
-        lcd.flush();
-        lcd.printf("F:%.1f", flow_meter.getFlowRate());
-        lcd.write(0);
-        lcd.print("   ");
-        // lcd.moveCursorLeft(2U);
+        // // Print Flow Data
+        // lcd.setCursor(0, 1);
+        // lcd.printf("F:%.1f", flow_meter.getFlowRate());
+        // lcd.write(0);
+        // lcd.print("   ");
+        // // lcd.moveCursorLeft(2U);
 
-        // Print Volume Data
-        lcd.setCursor(10, 1);
-        lcd.flush();
-        lcd.printf("V:%.1fL", currentVolume);
-        lcd.print("   ");
-        // lcd.moveCursorLeft(2U);
+        // // Print Volume Data
+        // lcd.setCursor(10, 1);
+        // lcd.printf("V:%.1fL", currentVolume);
+        // lcd.print("   ");
+        // // lcd.moveCursorLeft(2U);
 
-        // Print Ground Humidity
-        lcd.setCursor(0, 2);
-        lcd.flush();
-        lcd.printf("HG:%.1f", humidity.getHumidity());
-        lcd.print('%');
-        lcd.print(' ');
-        lcd.print(' ');
-        // lcd.moveCursorLeft(2U);
+        // // Print Ground Humidity
+        // // lcd.setCursor(0, 2);
+        // // lcd.printf("HG:%.1f", humidity.getHumidity());
+        // // lcd.print('%');
+        // // lcd.print(' ');
+        // // lcd.print(' ');
+        // // lcd.moveCursorLeft(2U);
 
-        // Print Ultrasonic
-        lcd.setCursor(10, 2);
-        lcd.flush();
-        lcd.printf("D:%.2fcm", ultrasonic->getDistance());
-        lcd.print("   ");
+        // // Print Ultrasonic
+        // lcd.setCursor(10, 2);
+        // lcd.printf("D:%.2fcm", ultrasonic->getDistance());
+        // lcd.print("   ");
 
-        // Print Solenoid
-        lcd.setCursor(0, 3);
-        lcd.flush();
-        lcd.print("Zawor: ");
-        if(solenoid.isOpen()){
-            lcd.print("Wl ");
-        } else {
-            lcd.print("Wyl");
-        }
+        // // Print Solenoid
+        // lcd.setCursor(0, 3);
+        // lcd.print("Zawor: ");
+        // if(solenoid.isOpen()){
+        //     lcd.print("Wl ");
+        // } else {
+        //     lcd.print("Wyl");
+        // }
 
     }
 }
