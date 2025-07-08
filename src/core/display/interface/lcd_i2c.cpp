@@ -15,7 +15,7 @@ namespace core::display::interface{
 
         this->character_buffer_size = columns * rows;
         this->character_buffer = (char *) malloc(this->character_buffer_size);
-        memset(this->character_buffer, ' ', this->character_buffer_size);
+        this->clear();
 
         Serial.printf("LCD_I2C initialized with %zu columns and %zu rows at address 0x%02X\n", columns, rows, address);
         Serial.printf("Screen size: %zu x %zu pixels\n", screen_width, screen_height);
@@ -25,6 +25,8 @@ namespace core::display::interface{
     void LCD_I2C::init(){
         lcd->begin(this->character_cols, this->character_rows);
         lcd->clear();
+        this->welcome();
+        this->render();
     }
 
     void LCD_I2C::render(){

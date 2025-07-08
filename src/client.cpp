@@ -78,6 +78,7 @@ namespace client
 
         Wire.setClock(10000);
 
+        display->clear();
 
         display->setCursor(0, 0);
         display->setText("S");

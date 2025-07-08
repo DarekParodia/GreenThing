@@ -36,14 +36,14 @@ void setup()
   Wire.begin(4, 5);
   core::setup();
 
+#ifdef USE_DISPLAY
+  core::display::setup();
+#endif
 #ifdef USE_WIFI
   core::wifi::setup();
 #endif
 #ifdef USE_API
   core::api::setup();
-#endif
-#ifdef USE_DISPLAY
-  core::display::setup();
 #endif
 
   client::setup();
@@ -57,11 +57,9 @@ void loop()
 #ifdef USE_WIFI
   core::wifi::loop();
 #endif
-
 #ifdef USE_API
   core::api::loop();
 #endif
-
 #ifdef USE_DISPLAY
   core::display::loop();
 #endif
