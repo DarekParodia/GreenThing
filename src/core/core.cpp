@@ -179,16 +179,17 @@ namespace core
         executeTimeouts(delay);
         while (micros() - startTime < delay)
         {
-            // Wait for the specified delay
+            yield(); // Prevent watchdog reset
         }
     }
+
     void delay(unsigned long delay)
     {
         unsigned long startTime = micros();
         executeTimeouts(delay * 1000);
         while (micros() - startTime < delay * 1000)
         {
-            // Wait for the specified delay
+            yield(); // Prevent watchdog reset
         }
     }
     void addModule(mod::Module *module)

@@ -14,15 +14,6 @@ namespace core::display::interface{
             void render() override;
     
         protected:
-            // Screen Parameters
-            size_t character_cols;
-            size_t character_rows;
-
-            size_t screen_width;
-            size_t screen_height;
-
-            uint8_t font_size;
-
             // LCD Parameters
             I2C_LCD *lcd;
             uint16_t address;

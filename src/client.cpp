@@ -15,12 +15,12 @@
 #include "core/core.h"
 #include "core/time.h"
 #include "core/wifi/wifi.h"
-#include "core/display/
+#include "core/display/display.h"
 
 #include <Wire.h>
 #include "I2C_LCD.h"
 
-// I2C_LCD lcd(39);
+#define display core::display::displayInterface
 
 mod::Button button("button1", 0, false, true);            // Button on pin 2, inverted logic
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
@@ -60,9 +60,6 @@ namespace client
 {
     void setup()
     {
-        Wire.begin(4, 5);
-        Wire.setClock(10000);
-
         core::addModule(&button);
         core::addModule(&solenoid);
         // core::addModule(&led);
@@ -80,6 +77,20 @@ namespace client
         wateringCycleOff();
 
         Wire.setClock(10000);
+
+
+        display->setCursor(0, 0);
+        display->setText("S");
+        display->setText("I");
+        display->moveCursor(1);
+        display->setText("e");
+        display->setCursor(10, 0);
+        display->setText("m");
+        display->setCursor(1, 3);
+        display->setText("anko");
+
+        display->setCursor(26, 6);
+        display->setText("Witam");
     }
 
     void loop()

@@ -3,15 +3,16 @@
 #include "interface/interface.h"
 #include "interface/lcd_i2c.h"
 
+#include <Arduino.h>
+
+#define REFRESHRATE 1;
+
 namespace core::display{
-    core::display::interface::DisplayInterface *displayInterface = nullptr;
+    extern const unsigned long renderDelay;
+    extern unsigned long lastRenderTime;
+    extern core::display::interface::DisplayInterface *displayInterface;
 
     // CORE FUNCTIONS
-    inline void setup(){
-        displayInterface = new LCD_I2C(20, 4);
-        displayInterface->init();
-    };
-    inline void render(){
-        displayInterface->render();
-    };
+    void setup();
+    void loop();
 }
