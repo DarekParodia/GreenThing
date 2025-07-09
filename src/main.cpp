@@ -19,14 +19,10 @@
 
 #include "client.h"
 
-// user loop TEMPORARY SOLUTION
-const int userLoopTime = 1000000; // Delay in microseconds
-unsigned long lastUserLoopTime = 0;
-
 void setup()
 {
   Serial.begin(115200);
-  Wire.setClock(10000);
+  Wire.setClock(I2C_SPEED);
   
   while (!Serial)
     ;
@@ -48,7 +44,7 @@ void setup()
 
   client::setup();
 
-  Wire.setClock(10000);
+  Wire.setClock(I2C_SPEED);
 
   Serial.println("Setup complete");
 }
@@ -68,11 +64,4 @@ void loop()
 #endif
 
   client::loop();
-  // Uncomment the following line to print the delta time
-  // Serial.print("Delta Time: ");
-  // Serial.println(core::getDeltaTime());
-  if (micros() >= userLoopTime + lastUserLoopTime){
-    client::userLoop();
-    lastUserLoopTime = micros();
-  }
 }

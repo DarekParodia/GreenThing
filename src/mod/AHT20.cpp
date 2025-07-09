@@ -1,5 +1,7 @@
 #include "AHT20.h"
 #include <Arduino.h>
+#include <Wire.h>
+
 
 namespace mod{
     AHT20::AHT20(std::string name)
@@ -11,18 +13,58 @@ namespace mod{
     AHT20::~AHT20(){}
 
     void AHT20::init(){
-        if(!this->aht.begin()){
-            Serial.println("Failed to initialize AHT20!");
-        }
+
     }
 
     void AHT20::loop(){
-        aht.getEvent(&humidity_event, &temp_event);
-        this->temperature = temp_event.temperature;
-        this->humidity = humidity_event.relative_humidity;
+        
+        
+       
     }
 
     void AHT20::userLoop(){
-        // Optional: implement if needed
+        // Wire.setClock(400000);
+        
+        this->measure();
+        this->trigger();
+
+        // Wire.setClock(I2C_SPEED);
+    }
+    void AHT20::trigger(){
+        // Send measurement command to AHT20 (0xAC, 0x33, 0x00)
+        Wire.beginTransmission(0x38);
+        Wire.write(0xAC);
+        Wire.write(0x33);
+        Wire.write(0x00);
+        Wire.endTransmission();
+    }
+
+    void AHT20::measure(){
+        const uint8_t address = 0x38;
+        uint8_t data[6] = {0};
+        Wire.requestFrom(address, 6u);
+        if (Wire.available() == 6) {
+            for (int i = 0; i < 6; ++i) {
+                data[i] = Wire.read();
+            }
+            // Only parse if status bit 7 == 0 (data ready)
+            if ((data[0] & 0x80) == 0) {
+                // Parse humidity (20 bits)
+                uint32_t hum_raw = ((uint32_t)data[1] << 12) | ((uint32_t)data[2] << 4) | (data[3] >> 4);
+                // Parse temperature (20 bits)
+                uint32_t temp_raw = (((uint32_t)data[3] & 0x0F) << 16) | ((uint32_t)data[4] << 8) | data[5];
+                // Convert to physical values
+                float humidity = (hum_raw * 100.0f) / 1048576.0f;
+                float temperature = (temp_raw * 200.0f) / 1048576.0f - 50.0f;
+                // Clamp values to valid range
+                if (humidity < 0) humidity = 0;
+                if (humidity > 100) humidity = 100;
+                if (temperature < -40) temperature = -40;
+                if (temperature > 85) temperature = 85;
+                this->humidity = humidity;
+                this->temperature = temperature;
+            }
+        }
+        // If data is not ready, just return without updating values
     }
 }

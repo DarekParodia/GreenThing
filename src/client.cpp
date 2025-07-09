@@ -47,6 +47,34 @@ double currentVolume = 0.0;
 const double containerVolume = 1000.0;  // Liters
 const double containerHeight = 100.0;   // Centimeter
 
+// SAFETY
+const double maxLiters = 25.0;
+const double secondsAfterCloseCheck = 3.0;
+const double flowTreshold = 1.0;
+bool _alarm = false;
+
+unsigned long lastValveClose = 0;
+double closingFlow = 0;
+
+void alarm(){
+    _alarm = true;
+}
+
+void dealarm(){
+    _alarm = false;
+}
+
+void alarmCheck(){
+    // Solenoid not closed
+    if(millis() >= lastValveClose + (secondsAfterCloseCheck * 1000.0) && !solenoid.isOpen() && flow_meter.getFlowRate() - closingFlow > flowTreshold){
+        alarm();
+    } else if(currentVolume >= maxLiters){
+        solenoid.close();
+    } else{
+        dealarm();
+    }
+}
+
 double getUsPercentage(){
     return (containerHeight - ultrasonic->getDistance()) / containerHeight;
 }
@@ -62,7 +90,9 @@ void wateringCycleOn(){
 }
 
 void wateringCycleOff(){
+    closingFlow = flow_meter.getFlowRate();
     solenoid.close();
+    lastValveClose = millis();
 }
 
 namespace client
@@ -93,48 +123,14 @@ namespace client
                 wateringCycleOff();
             }
         }
-    }
 
-    void userLoop()
-    {
-        // // Print Flow Data
-        // lcd.setCursor(0, 1);
-        // lcd.printf("F:%.1f", flow_meter.getFlowRate());
-        // lcd.write(0);
-        // lcd.print("   ");
-        // // lcd.moveCursorLeft(2U);
-
-        // // Print Volume Data
-        // lcd.setCursor(10, 1);
-        // lcd.printf("V:%.1fL", currentVolume);
-        // lcd.print("   ");
-        // // lcd.moveCursorLeft(2U);
-
-        // // Print Ground Humidity
-        // // lcd.setCursor(0, 2);
-        // // lcd.printf("HG:%.1f", humidity.getHumidity());
-        // // lcd.print('%');
-        // // lcd.print(' ');
-        // // lcd.print(' ');
-        // // lcd.moveCursorLeft(2U);
-
-        // // Print Ultrasonic
-        // lcd.setCursor(10, 2);
-        // lcd.printf("D:%.2fcm", ultrasonic->getDistance());
-        // lcd.print("   ");
-
-        // // Print Solenoid
-        // lcd.setCursor(0, 3);
-        // lcd.print("Zawor: ");
-        // if(solenoid.isOpen()){
-        //     lcd.print("Wl ");
-        // } else {
-        //     lcd.print("Wyl");
-        // }
-
+        alarmCheck();
     }
 
     void render(){
+        // Serial.print(millis());
+        // Serial.print(" alarm: ");
+        // Serial.println(_alarm);
         disp->clear();
 
         // First row (Temperature Humidity and time)
@@ -190,7 +186,5 @@ namespace client
         std::string volume_str = std::string(buf);
         disp->setCursor(disp->getCols() - volume_str.size(), 3);
         disp->setText(volume_str);
-
-        Serial.println(volume_str.c_str());
     }
 }

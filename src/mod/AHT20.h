@@ -4,7 +4,6 @@
 #include "humidity.h"
 
 #include <string>
-#include <Adafruit_AHTX0.h>
 
 namespace mod {
 class AHT20 : public virtual Module, public Temperature, public Humidity {
@@ -15,9 +14,8 @@ class AHT20 : public virtual Module, public Temperature, public Humidity {
         void init();
         void loop();  
         void userLoop();
-
     private:
-        Adafruit_AHTX0 aht;
-        sensors_event_t humidity_event, temp_event;
+        void trigger();
+        void measure();
 };
 } // namespace mod

@@ -38,8 +38,9 @@ namespace core::display::interface{
     }
 
     void LCD_I2C::render(){
+        Wire.setClock(40000000);
         lcd->flush();
-        // lcd->clear();
+        lcd->clear();
         size_t pointerIndex = 0;
         for (size_t row = 0; row < character_rows; row++){
             lcd->setCursor(0, row);
@@ -56,6 +57,7 @@ namespace core::display::interface{
             Serial.print("Wrote character: ");
             Serial.println(chp.character);
         }
+        Wire.setClock(I2C_SPEED);
     }
 
     void LCD_I2C::createCustomChars(){
