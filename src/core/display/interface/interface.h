@@ -42,6 +42,10 @@ namespace core::display::interface {
                 moveCursor(text.size());
             }
 
+            inline void setText(int text){
+                setText(std::to_string(text));
+            }
+
             inline void setTextCentered(std::string text){
                 moveCursor(-(text.size() / 2));
                 setText(text);

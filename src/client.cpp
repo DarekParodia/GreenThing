@@ -44,6 +44,18 @@ bool prevButton = false;
 int currentVolMeasurment = -1;
 double currentVolume = 0.0;
 
+const double containerVolume = 1000.0;  // Liters
+const double containerHeight = 100.0;   // Centimeter
+
+double getUsPercentage(){
+    return (containerHeight - ultrasonic->getDistance()) / containerHeight;
+}
+
+double getUsVolume(){
+    return containerVolume * getUsPercentage();
+}   
+// For my personal use case. It calculates water level percentage based on distance to water surface from the top of container
+
 void wateringCycleOn(){
     currentVolume = 0.0;
     solenoid.open();
@@ -85,28 +97,6 @@ namespace client
 
     void userLoop()
     {
-        // // lcd.clear();
-        // // Display IP
-        // // lcd.flush();
-        // lcd.setCursor(0, 0);
-        // if (core::wifi::isConnected())
-        //     lcd.print(core::wifi::getStringIP().c_str());
-        // else
-        //     lcd.print("Connecting...");
-
-        // // Print Current Time
-        // int hour = core::time->getHour(true);
-        // int minute = core::time->getMinute();
-
-        // std::string hour_s = hour < 10 ? "0" + std::to_string(hour) : std::to_string(hour);
-        // std::string minute_s = minute < 10 ? "0" + std::to_string(minute) : std::to_string(minute);
-
-        // lcd.setCursor(15, 0);
-        // lcd.print(hour_s.c_str());
-        // // lcd.setCursor(17, 0);
-        // lcd.print(':');
-        // lcd.print(minute_s.c_str());
-
         // // Print Flow Data
         // lcd.setCursor(0, 1);
         // lcd.printf("F:%.1f", flow_meter.getFlowRate());
@@ -157,7 +147,50 @@ namespace client
         snprintf(buf, sizeof(buf), "%.1fH", aht20.getHumidity()); 
         disp->setText(buf);
 
-
+        int hour = core::time->getHour(true);
+        int minute = core::time->getMinute();
+        std::string hour_s = hour < 10 ? "0" + std::to_string(hour) : std::to_string(hour);
+        std::string minute_s = minute < 10 ? "0" + std::to_string(minute) : std::to_string(minute);
+        disp->setCursor(disp->getCols() - 5, 0);
+        disp->setText(hour_s);
+        disp->setText(":");
+        disp->setText(minute_s);
         
+        // Second row (Flow Rate, Volume, US distance)
+        disp->setCursor(0, 1);
+        snprintf(buf, sizeof(buf), "%.1fL/min", flow_meter.getFlowRate());
+        disp->setText(buf);
+        
+        snprintf(buf, sizeof(buf), "%.1fL", currentVolume);
+        std::string vol_str = std::string(buf);
+        disp->setCursor(disp->getCols() - vol_str.size(), 1);
+        disp->setText(vol_str);
+
+        // Third row (US distance, US Percentage)
+        disp->setCursor(0, 2);
+        snprintf(buf, sizeof(buf), "D:%.1fcm", ultrasonic->getDistance());
+        disp->setText(buf); 
+
+        snprintf(buf, sizeof(buf), "%.2f", getUsPercentage());
+        std::string perc_str = std::string(buf);
+        disp->setCursor(disp->getCols() - perc_str.size(), 2);
+        disp->setText(perc_str);
+
+
+        // Fourth row (Solenoid state, US Volume)
+        disp->setCursor(0, 3);
+        disp->setText("Zawor: ");
+        if(solenoid.isOpen()){
+            disp->setText("Wl ");
+        } else {
+            disp->setText("Wyl");   
+        }
+
+        snprintf(buf, sizeof(buf), "%dL", (int) getUsVolume());
+        std::string volume_str = std::string(buf);
+        disp->setCursor(disp->getCols() - volume_str.size(), 3);
+        disp->setText(volume_str);
+
+        Serial.println(volume_str.c_str());
     }
 }
