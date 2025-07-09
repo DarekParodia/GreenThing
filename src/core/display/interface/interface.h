@@ -2,11 +2,22 @@
 
 #include <string>
 #include <cstring>
+#include <vector>
 #include <unistd.h>
 
 #include <Arduino.h>
 
 namespace core::display::interface {
+
+    enum CustomChar : uint8_t {
+        CELSIUS = 0
+    };
+    struct char_pos
+    {
+        size_t index;
+        core::display::interface::CustomChar character;
+    };
+            
     class DisplayInterface {
         public:
             DisplayInterface() = default;
@@ -36,6 +47,12 @@ namespace core::display::interface {
                 setText(text);
             }
             
+            inline void setCustomChar(core::display::interface::CustomChar character){
+                char_pos pos = {getCursorIndex(), character};
+                custom_char_positions.push_back(pos);
+                moveCursor(1);
+            }
+
             inline void setCursor(size_t x, size_t y) {
                 this->cursor_x = x % character_cols;
                 this->cursor_y = y % character_rows;
@@ -51,6 +68,15 @@ namespace core::display::interface {
 
             inline void clear() {
                 memset(this->character_buffer, ' ', this->character_buffer_size);
+                custom_char_positions.clear();
+            }
+
+            inline size_t getCols(){
+                return character_cols;
+            }
+
+            inline size_t getRows(){
+                return character_rows;
             }
 
         protected:
@@ -68,8 +94,12 @@ namespace core::display::interface {
             char *character_buffer = nullptr;
             size_t character_buffer_size;
 
+            std::vector<char_pos> custom_char_positions;
+
             inline size_t getCursorIndex(){
                 return (character_cols * cursor_y) + cursor_x;
             }
+
+            virtual void createCustomChars();
     };
 }

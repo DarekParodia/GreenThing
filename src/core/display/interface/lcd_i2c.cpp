@@ -1,4 +1,7 @@
 #include "lcd_i2c.h"
+
+#include "core/display/display.h"
+
 #include <string>
 #include <Arduino.h>
 
@@ -22,9 +25,14 @@ namespace core::display::interface{
         Serial.printf("Character buffer size: %zu bytes\n", character_buffer_size);
     }
 
+    LCD_I2C::~LCD_I2C(){
+        free(character_buffer);
+    }
+
     void LCD_I2C::init(){
         lcd->begin(this->character_cols, this->character_rows);
         lcd->clear();
+        this->createCustomChars();
         this->welcome();
         this->render();
     }
@@ -40,5 +48,30 @@ namespace core::display::interface{
             lcd->print(line);
             pointerIndex += character_cols;
         }
+
+        for(size_t i = 0; i < custom_char_positions.size(); i++){
+            core::display::interface::char_pos chp = custom_char_positions[i];
+            lcd->setCursor(chp.index % character_cols, chp.index / character_cols);
+            lcd->write(chp.character);
+            Serial.print("Wrote character: ");
+            Serial.println(chp.character);
+        }
+    }
+
+    void LCD_I2C::createCustomChars(){
+        // degree
+        byte customChar[] = {
+            B11000,
+            B11000,
+            B00000,
+            B00111,
+            B00100,
+            B00100,
+            B00100,
+            B00111
+        };
+
+        lcd->createChar(core::display::interface::CustomChar::CELSIUS, customChar);
+
     }
 }

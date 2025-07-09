@@ -17,5 +17,7 @@ namespace core::display::interface{
             // LCD Parameters
             I2C_LCD *lcd;
             uint16_t address;
+
+            void createCustomChars() override;
     };
 }

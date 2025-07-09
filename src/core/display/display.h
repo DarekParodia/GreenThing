@@ -1,7 +1,7 @@
 #pragma once
 
-#include "interface/interface.h"
-#include "interface/lcd_i2c.h"
+#include "core/display/interface/interface.h"
+#include "core/display/interface/lcd_i2c.h"
 
 #include <Arduino.h>
 

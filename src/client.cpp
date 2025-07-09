@@ -146,14 +146,18 @@ namespace client
 
     void render(){
         disp->clear();
+
+        // First row (Temperature Humidity and time)
         disp->setCursor(0, 0);
-        char buf[32];
-        snprintf(buf, sizeof(buf), "Temperature: %.2f", aht20.getTemperature());
+        char buf[32] = { 0 };
+        snprintf(buf, sizeof(buf), "%.1fC", aht20.getTemperature()); 
         disp->setText(buf);
 
-        disp->setCursor(0, 1);
-        snprintf(buf, sizeof(buf), "Humidity: %.2f", aht20.getHumidity());
+        disp->moveCursor(1);
+        snprintf(buf, sizeof(buf), "%.1fH", aht20.getHumidity()); 
         disp->setText(buf);
 
+
+        
     }
 }
