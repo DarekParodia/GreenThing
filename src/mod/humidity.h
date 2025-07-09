@@ -3,7 +3,7 @@
 #include <string>
 
 namespace mod {
-    class Humidity : public Module {
+    class Humidity : public virtual Module {
         public:
             Humidity(std::string name, int pin, bool inverted = false, int zeroValue = 0, int maxValue = 4096);
             ~Humidity();
@@ -16,8 +16,7 @@ namespace mod {
                 return humidity;
             }
 
-        private:
-            std::string name;
+        protected:
             int pin;
             bool inverted = false; // Inverted logic for the sensor, if true, 0% humidity is represented by maxValue and 100% by zeroValue
 

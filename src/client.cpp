@@ -11,6 +11,7 @@
 #include "mod/humidity.h"
 #include "mod/ultrasonic.h"
 #include "mod/rcwl_1x05.h"
+#include "mod/AHT20.h"
 
 #include "core/core.h"
 #include "core/time.h"
@@ -22,16 +23,12 @@
 
 #define disp core::display::displayInterface
 
-mod::Button button("button1", 0, false, true);            // Button on pin 2, inverted logic
-mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
-// mod::Led led("led1", 13, false, 1000);                    // LED on pin 13, not inverted, toggle interval 1000ms
-// mod::FlowMeter flow_meter("flow_meter1", A0, 512, 5.5);            // Flow meter on pin 2, default trigger point 512, default frequency per flow factor 5.5
-
+mod::Button button("button1", 0, false, true);           
+mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); 
 mod::FlowMeter flow_meter("flow_meter1", 13);            
-
-mod::Humidity humidity("humidity1", A0, true, 0, 1024);            // Humidity sensor on pin 4
-// mod::Ultrasonic ultrasonic("ultrasonic1", 12, 13); // Ultrasonic sensor on pin 12 (trigger) and pin 13 (echo)
-mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); // RCWL-1X05 ultrasonic sensor uses default I2C bus
+mod::Humidity humidity("humidity1", A0, true, 0, 1024);       
+mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); 
+mod::AHT20 aht20("AHT20");
 
 // byte char_litersPerMinute[] = {
 //     B01000,
@@ -62,16 +59,10 @@ namespace client
     {
         core::addModule(&button);
         core::addModule(&solenoid);
-        // core::addModule(&led);
         core::addModule(&flow_meter);
         // core::addModule(&humidity);
         core::addModule(ultrasonic);
-
-        // lcd.begin(20, 4);
-        // lcd.clear();
-        // lcd.backlight();
-
-        // lcd.createChar(0, char_litersPerMinute);
+        core::addModule(&aht20);
 
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
         wateringCycleOff();
@@ -156,6 +147,13 @@ namespace client
     void render(){
         disp->clear();
         disp->setCursor(0, 0);
-        disp->setText(std::to_string(core::display::frameCount));
+        char buf[32];
+        snprintf(buf, sizeof(buf), "Temperature: %.2f", aht20.getTemperature());
+        disp->setText(buf);
+
+        disp->setCursor(0, 1);
+        snprintf(buf, sizeof(buf), "Humidity: %.2f", aht20.getHumidity());
+        disp->setText(buf);
+
     }
 }
