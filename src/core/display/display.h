@@ -5,11 +5,12 @@
 
 #include <Arduino.h>
 
-#define REFRESHRATE 1;
+#define REFRESHRATE 1
 
 namespace core::display{
     extern const unsigned long renderDelay;
     extern unsigned long lastRenderTime;
+    extern unsigned long frameCount;
     extern core::display::interface::DisplayInterface *displayInterface;
 
     // CORE FUNCTIONS

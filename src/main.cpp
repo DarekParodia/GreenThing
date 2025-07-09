@@ -47,6 +47,9 @@ void setup()
 #endif
 
   client::setup();
+
+  Wire.setClock(10000);
+
   Serial.println("Setup complete");
 }
 

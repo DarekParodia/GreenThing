@@ -1,8 +1,10 @@
 #include "display.h"
+#include "client.h"
 
 namespace core::display{
     constexpr unsigned long renderDelay =  1000 / REFRESHRATE;
     unsigned long lastRenderTime = 0;
+    unsigned long frameCount = 0;
     core::display::interface::DisplayInterface *displayInterface = nullptr;
 
     void setup(){
@@ -11,6 +13,8 @@ namespace core::display{
     };
     void loop(){
         if(millis() >= lastRenderTime + renderDelay){
+            frameCount++;
+            client::render();
             displayInterface->render();
             lastRenderTime = millis();
         }

@@ -20,7 +20,7 @@
 #include <Wire.h>
 #include "I2C_LCD.h"
 
-#define display core::display::displayInterface
+#define disp core::display::displayInterface
 
 mod::Button button("button1", 0, false, true);            // Button on pin 2, inverted logic
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); // Solenoid on pin 16 and 14, not inverted, pulse time 100ms
@@ -76,22 +76,7 @@ namespace client
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
         wateringCycleOff();
 
-        Wire.setClock(10000);
-
-        display->clear();
-
-        display->setCursor(0, 0);
-        display->setText("S");
-        display->setText("I");
-        display->moveCursor(1);
-        display->setText("e");
-        display->setCursor(10, 0);
-        display->setText("m");
-        display->setCursor(1, 3);
-        display->setText("anko");
-
-        display->setCursor(26, 6);
-        display->setText("Witam");
+        disp->clear();
     }
 
     void loop()
@@ -166,5 +151,11 @@ namespace client
         //     lcd.print("Wyl");
         // }
 
+    }
+
+    void render(){
+        disp->clear();
+        disp->setCursor(0, 0);
+        disp->setText(std::to_string(core::display::frameCount));
     }
 }
