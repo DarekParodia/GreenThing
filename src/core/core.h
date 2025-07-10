@@ -34,6 +34,7 @@ namespace core
     void delay(unsigned long delay);
     void addModule(mod::Module *module);
     void addTimeout(timeout_t *timeout);
+    void removeTimeout(timeout_t *timeout);
     void removeModule(mod::Module *module);
     unsigned long getDeltaTime();
     std::vector<mod::Module *> getModules();

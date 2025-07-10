@@ -20,6 +20,7 @@ namespace core::display::interface{
         this->character_buffer = (char *) malloc(this->character_buffer_size);
         this->prev_buffer = (char *) malloc(this->character_buffer_size);
         this->clear();
+        this->setBacklight(true);
 
         Serial.printf("LCD_I2C initialized with %zu columns and %zu rows at address 0x%02X\n", columns, rows, address);
         Serial.printf("Screen size: %zu x %zu pixels\n", screen_width, screen_height);
@@ -97,6 +98,11 @@ namespace core::display::interface{
 
         Wire.setClock(I2C_SPEED);
         Wire.flush();
+    }
+
+    void LCD_I2C::setBacklight(bool on){
+        if(on) lcd->backlight();
+        else lcd->noBacklight();
     }
 
     void LCD_I2C::createCustomChars(){

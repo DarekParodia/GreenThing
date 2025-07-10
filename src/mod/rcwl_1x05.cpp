@@ -30,12 +30,12 @@ namespace mod {
     }
 
     void RCWL_1x05::loop() {
-        bool newData = sensor->update(); // calling update() repeatedly is crucial in continuous mode
-        if (newData) {
-            unsigned int distance = sensor->read();
-            if(distance != 0)
-                this->distance = (double) distance / 10.0; // Convert mm to cm
-        }
+        // bool newData = sensor->update(); // calling update() repeatedly is crucial in continuous mode
+        // if (newData) {
+        //     unsigned int distance = sensor->read();
+        //     if(distance != 0)
+        //         this->distance = (double) distance / 10.0; // Convert mm to cm
+        // }
     }
 
     void RCWL_1x05::userLoop() {

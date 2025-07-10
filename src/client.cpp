@@ -48,13 +48,17 @@ const double containerVolume = 1000.0;  // Liters
 const double containerHeight = 100.0;   // Centimeter
 
 // SAFETY
-const double maxLiters = 25.0;
-const double secondsAfterCloseCheck = 3.0;
-const double flowTreshold = 1.0;
+const double maxLiters = 10.0;
+const double secondsAfterCloseCheck = 15.0;
+const double secondsPerCloseTry = 7.5;
+const double flowTreshold = 5.0;
 bool _alarm = false;
 
 unsigned long lastValveClose = 0;
+unsigned long lastValveCloseTry = 0;
 double closingFlow = 0;
+
+bool prevSolenoid = false;
 
 void alarm(){
     _alarm = true;
@@ -94,6 +98,7 @@ void wateringCycleOff(){
     solenoid.close();
     lastValveClose = millis();
 }
+core::timeout_t *timeout = nullptr;
 
 namespace client
 {
@@ -110,6 +115,7 @@ namespace client
         wateringCycleOff();
 
         disp->clear();
+        // disp->setBacklight(false);
     }
 
     void loop()
@@ -126,11 +132,37 @@ namespace client
 
         ultrasonic->setTemperature(aht20.getTemperature());
         alarmCheck();
+
+        // backlight
+        // if (solenoid.isOpen() != prevSolenoid){
+        //     // Solenoid changed
+        //     if(solenoid.isOpen()){
+        //         // solenoid made open
+        //         disp->setBacklight(true);
+        //         if(timeout != nullptr){
+        //             core::removeTimeout(timeout);
+        //             delete timeout;
+        //             timeout = nullptr;
+        //         }
+        //     } else{
+        //         // solenoid made close
+        //         if(timeout == nullptr)
+        //             timeout = new core::timeout_t();
+        //         timeout->delay = 15000;
+        //         timeout->callback = [](void *custom_pointer)
+        //         {
+        //             disp->setBacklight(false);
+        //         };
+        //         core::addTimeout(timeout);
+        //     }
+        //     prevSolenoid = solenoid.isOpen();
+        // }
     }
 
     void render(){
-        if(_alarm){
+        if(_alarm && millis() >= lastValveCloseTry + (secondsPerCloseTry * 1000)){
             solenoid.setState(false);
+            lastValveCloseTry = millis();
         }
 
         // Serial.print(millis());

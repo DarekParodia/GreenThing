@@ -12,6 +12,8 @@ namespace core::display::interface{
 
             void init() override;
             void render() override;
+
+            void setBacklight(bool on) override;
     
         protected:
             // LCD Parameters

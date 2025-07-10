@@ -167,10 +167,10 @@ namespace core
         for (auto &module : modules)
         {
             module->userLoop();
-            // Serial.print(module->getName().c_str());
-            // Serial.printf(": %d us|", module->loopDelta);
+            Serial.print(module->getName().c_str());
+            Serial.printf(": %d us|", module->loopDelta);
         }
-        // Serial.println("");
+        Serial.println("");
 
     }
     void delayMicroseconds(unsigned long delay)
@@ -202,6 +202,10 @@ namespace core
     {
         timeout->startTime = millis();
         timeouts.push_back(timeout);
+    }
+
+    void removeTimeout(timeout_t *timeout){
+        timeouts.erase(std::remove(timeouts.begin(), timeouts.end(), timeout), timeouts.end());
     }
 
     void removeModule(mod::Module *module)

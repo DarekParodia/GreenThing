@@ -26,6 +26,8 @@ namespace core::display::interface {
             virtual void init() = 0;
             virtual void render() = 0;
 
+            virtual void setBacklight(bool on);
+
             inline void welcome(){
                 size_t centerx = character_cols / 2;
                 size_t centery = character_rows / 2;
