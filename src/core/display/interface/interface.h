@@ -96,6 +96,7 @@ namespace core::display::interface {
 
             // Text Printing
             char *character_buffer = nullptr;
+            char *prev_buffer = nullptr;
             size_t character_buffer_size;
 
             std::vector<char_pos> custom_char_positions;

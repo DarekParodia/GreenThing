@@ -57,10 +57,10 @@ namespace mod{
                 float humidity = (hum_raw * 100.0f) / 1048576.0f;
                 float temperature = (temp_raw * 200.0f) / 1048576.0f - 50.0f;
                 // Clamp values to valid range
-                if (humidity < 0) humidity = 0;
-                if (humidity > 100) humidity = 100;
-                if (temperature < -40) temperature = -40;
-                if (temperature > 85) temperature = 85;
+                if (humidity < 0) return;
+                if (humidity > 100) return;
+                if (temperature < -40) return;
+                if (temperature > 85) return;
                 this->humidity = humidity;
                 this->temperature = temperature;
             }

@@ -68,7 +68,7 @@ void alarmCheck(){
     // Solenoid not closed
     if(millis() >= lastValveClose + (secondsAfterCloseCheck * 1000.0) && !solenoid.isOpen() && flow_meter.getFlowRate() - closingFlow > flowTreshold){
         alarm();
-    } else if(currentVolume >= maxLiters){
+    } else if(currentVolume >= maxLiters && solenoid.isOpen()){
         solenoid.close();
     } else{
         dealarm();
@@ -128,10 +128,14 @@ namespace client
     }
 
     void render(){
+        if(_alarm){
+            solenoid.setState(false);
+        }
+
         // Serial.print(millis());
         // Serial.print(" alarm: ");
         // Serial.println(_alarm);
-        disp->clear();
+        // disp->clear();
 
         // First row (Temperature Humidity and time)
         disp->setCursor(0, 0);
@@ -167,10 +171,15 @@ namespace client
         snprintf(buf, sizeof(buf), "D:%.1fcm", ultrasonic->getDistance());
         disp->setText(buf); 
 
-        snprintf(buf, sizeof(buf), "%.2f", getUsPercentage());
-        std::string perc_str = std::string(buf);
-        disp->setCursor(disp->getCols() - perc_str.size(), 2);
-        disp->setText(perc_str);
+        // snprintf(buf, sizeof(buf), "%.2f", getUsPercentage());
+        // std::string perc_str = std::string(buf);
+        // disp->setCursor(disp->getCols() - perc_str.size(), 2);
+        // disp->setText(perc_str);
+
+        snprintf(buf, sizeof(buf), "%dL", (int) getUsVolume());
+        std::string volume_str = std::string(buf);
+        disp->setCursor(disp->getCols() - volume_str.size(), 2);
+        disp->setText(volume_str);
 
 
         // Fourth row (Solenoid state, US Volume)
@@ -182,9 +191,6 @@ namespace client
             disp->setText("Wyl");   
         }
 
-        snprintf(buf, sizeof(buf), "%dL", (int) getUsVolume());
-        std::string volume_str = std::string(buf);
-        disp->setCursor(disp->getCols() - volume_str.size(), 3);
-        disp->setText(volume_str);
+        
     }
 }

@@ -18,6 +18,7 @@ namespace core::display::interface{
 
         this->character_buffer_size = columns * rows;
         this->character_buffer = (char *) malloc(this->character_buffer_size);
+        this->prev_buffer = (char *) malloc(this->character_buffer_size);
         this->clear();
 
         Serial.printf("LCD_I2C initialized with %zu columns and %zu rows at address 0x%02X\n", columns, rows, address);
@@ -27,6 +28,7 @@ namespace core::display::interface{
 
     LCD_I2C::~LCD_I2C(){
         free(character_buffer);
+        free(prev_buffer);
     }
 
     void LCD_I2C::init(){
@@ -38,26 +40,63 @@ namespace core::display::interface{
     }
 
     void LCD_I2C::render(){
-        Wire.setClock(40000000);
+        Wire.setClock(100000);
+        Wire.flush();
         lcd->flush();
-        lcd->clear();
+        // lcd->clear();
+        // size_t pointerIndex = 0;
+        // for (size_t row = 0; row < character_rows; row++){
+        //     lcd->setCursor(0, row);
+        //     lcd->flush();
+        //     char line[character_cols] = {0};
+        //     memcpy(line, character_buffer + pointerIndex, character_cols);
+        //     lcd->print(line);
+        //     lcd->flush();
+        //     pointerIndex += character_cols;
+        // }
+
+        // for(size_t i = 0; i < custom_char_positions.size(); i++){
+        //     core::display::interface::char_pos chp = custom_char_positions[i];
+        //     lcd->setCursor(chp.index % character_cols, chp.index / character_cols);
+        //     lcd->write(chp.character);
+        //     // Serial.print("Wrote character: ");
+        //     // Serial.println(chp.character);
+        // }
+        // Wire.setClock(I2C_SPEED);
+        // Wire.flush();
+
+        // lcd->clear();
         size_t pointerIndex = 0;
         for (size_t row = 0; row < character_rows; row++){
-            lcd->setCursor(0, row);
-            char line[character_cols] = {0};
-            memcpy(line, character_buffer + pointerIndex, character_cols);
-            lcd->print(line);
+            for (size_t col = 0; col < character_cols; col++){
+                size_t bufIndex = pointerIndex + col;
+                char c = character_buffer[bufIndex];
+                char prev_c = prev_buffer[bufIndex];
+                if (c == prev_c) continue;
+                lcd->setCursor(col, row);
+                lcd->write(c); // Write each character individually
+                lcd->flush();
+            }
             pointerIndex += character_cols;
         }
 
+        // Render custom characters at their positions
         for(size_t i = 0; i < custom_char_positions.size(); i++){
             core::display::interface::char_pos chp = custom_char_positions[i];
-            lcd->setCursor(chp.index % character_cols, chp.index / character_cols);
+            size_t col = chp.index % character_cols;
+            size_t row = chp.index / character_cols;
+            lcd->setCursor(col, row);
             lcd->write(chp.character);
-            Serial.print("Wrote character: ");
-            Serial.println(chp.character);
+            lcd->flush();
         }
+
+        char* tmp = prev_buffer;
+        prev_buffer = character_buffer;
+        character_buffer = tmp;
+        this->clear();
+
         Wire.setClock(I2C_SPEED);
+        Wire.flush();
     }
 
     void LCD_I2C::createCustomChars(){

@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 
-#define REFRESHRATE 2
+#define REFRESHRATE 1
 
 namespace core::display{
     extern const unsigned long renderDelay;
