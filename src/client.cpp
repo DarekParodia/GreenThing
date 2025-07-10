@@ -27,7 +27,7 @@ mod::Button button("button1", 0, false, true);
 mod::Solenoid solenoid("solenoid1", 16, 14, false, 250); 
 mod::FlowMeter flow_meter("flow_meter1", 13);            
 mod::Humidity humidity("humidity1", A0, true, 0, 1024);       
-mod::Ultrasonic *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); 
+mod::RCWL_1x05 *ultrasonic = new mod::RCWL_1x05("rcwl1x05"); 
 mod::AHT20 aht20("AHT20");
 
 // byte char_litersPerMinute[] = {
@@ -124,6 +124,7 @@ namespace client
             }
         }
 
+        ultrasonic->setTemperature(aht20.getTemperature());
         alarmCheck();
     }
 

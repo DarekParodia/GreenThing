@@ -4,7 +4,7 @@
 
 namespace mod {
     RCWL_1x05::RCWL_1x05(std::string name)
-        : Ultrasonic(name, -1, -1), Module()
+        : Ultrasonic(name, -1, -1)
     {
         this->name = name;
         this->sensor = new RCWL_1X05();
@@ -22,7 +22,7 @@ namespace mod {
             return; // Exit if initialization failed
         }
 
-        this->sensor->setMode(RCWL_1X05::triggered); // Set mode to triggered
+        this->sensor->setMode(RCWL_1X05::continuous); // Set mode to triggered
         this->sensor->setTemperature(20); // Set default temperature
         this->sensor->setTimeout(200); // Set timeout to 200 ms
         this->sensor->setFilter(false);
@@ -30,22 +30,16 @@ namespace mod {
     }
 
     void RCWL_1x05::loop() {
-
+        bool newData = sensor->update(); // calling update() repeatedly is crucial in continuous mode
+        if (newData) {
+            unsigned int distance = sensor->read();
+            if(distance != 0)
+                this->distance = (double) distance / 10.0; // Convert mm to cm
+        }
     }
 
     void RCWL_1x05::userLoop() {
-        if(this->failed) {
-            // Serial.println("RCWL_1X05 sensor initialization failed, skipping measurement.");
-            return; // Skip measurement if initialization failed
-        }
-        unsigned int distance = sensor->read();
-        sensor->read();
-        if(distance != 0)
-        this->distance = (double) distance / 10.0; // Convert mm to cm
 
-        // Serial.println(("Distance: " + std::to_string(this->getDistance()) + " cm").c_str());
-
-        this->sensor->trigger(); // Trigger a new measurement
     }
 
     double RCWL_1x05::getDistance() {

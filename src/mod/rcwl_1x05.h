@@ -6,7 +6,7 @@
 #include <RCWL_1X05.h>
 
 namespace mod {
-    class RCWL_1x05 : public Ultrasonic, public Module {
+    class RCWL_1x05 : public Ultrasonic {
         public:
             RCWL_1x05(std::string name);
             ~RCWL_1x05();
@@ -16,6 +16,10 @@ namespace mod {
             void userLoop() override;
 
             double getDistance() override;
+
+            inline void setTemperature(int16_t temperature){
+                this->sensor->setTemperature(temperature);
+            }
 
         private:
             double distance = 0.0; // Distance in cm
