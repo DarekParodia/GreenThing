@@ -1,24 +1,24 @@
 #pragma once
-#include "module.h"
+#include "modules/base/module.h"
+
 #include <string>
 
-namespace mod {
+namespace modules {
     class Ultrasonic : public Module {
         public:
             Ultrasonic(std::string name, int triggerPin, int echoPin);
             ~Ultrasonic();
 
-            void init() override;
-            void loop() override;
-            void userLoop() override;
+            void           init() override;
+            void           loop() override;
+            void           userLoop() override;
 
             virtual double getDistance();
 
         private:
-            std::string name;
-            int triggerPin;
-            int echoPin;
+            int    triggerPin;
+            int    echoPin;
 
             double distance = 0.0; // Distance in cm
     };
-}
+} // namespace modules

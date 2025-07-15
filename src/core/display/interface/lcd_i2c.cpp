@@ -1,24 +1,23 @@
+#include "core/display/display.h"
 #include "lcd_i2c.h"
 
-#include "core/display/display.h"
-
-#include <string>
 #include <Arduino.h>
+#include <string>
 
-namespace core::display::interface{
-    LCD_I2C::LCD_I2C(size_t columns, size_t rows, uint16_t address){
-        this->character_cols = columns;
-        this->character_rows = rows;
-        this->screen_width = columns * 5;
-        this->screen_height = rows * 8;
-        this->font_size = 8;
+namespace core::display::interface {
+    LCD_I2C::LCD_I2C(size_t columns, size_t rows, uint16_t address) {
+        this->character_cols        = columns;
+        this->character_rows        = rows;
+        this->screen_width          = columns * 5;
+        this->screen_height         = rows * 8;
+        this->font_size             = 8;
 
-        this->address = address;
-        this->lcd = new I2C_LCD(address);
+        this->address               = address;
+        this->lcd                   = new I2C_LCD(address);
 
         this->character_buffer_size = columns * rows;
-        this->character_buffer = (char *) malloc(this->character_buffer_size);
-        this->prev_buffer = (char *) malloc(this->character_buffer_size);
+        this->character_buffer      = (char *) malloc(this->character_buffer_size);
+        this->prev_buffer           = (char *) malloc(this->character_buffer_size);
         this->clear();
         this->setBacklight(true);
 
@@ -27,12 +26,12 @@ namespace core::display::interface{
         Serial.printf("Character buffer size: %zu bytes\n", character_buffer_size);
     }
 
-    LCD_I2C::~LCD_I2C(){
+    LCD_I2C::~LCD_I2C() {
         free(character_buffer);
         free(prev_buffer);
     }
 
-    void LCD_I2C::init(){
+    void LCD_I2C::init() {
         lcd->begin(this->character_cols, this->character_rows);
         lcd->clear();
         this->createCustomChars();
@@ -40,7 +39,7 @@ namespace core::display::interface{
         this->render();
     }
 
-    void LCD_I2C::render(){
+    void LCD_I2C::render() {
         Wire.setClock(100000);
         Wire.flush();
         lcd->flush();
@@ -68,12 +67,12 @@ namespace core::display::interface{
 
         // lcd->clear();
         size_t pointerIndex = 0;
-        for (size_t row = 0; row < character_rows; row++){
-            for (size_t col = 0; col < character_cols; col++){
+        for(size_t row = 0; row < character_rows; row++) {
+            for(size_t col = 0; col < character_cols; col++) {
                 size_t bufIndex = pointerIndex + col;
-                char c = character_buffer[bufIndex];
-                char prev_c = prev_buffer[bufIndex];
-                if (c == prev_c) continue;
+                char   c        = character_buffer[bufIndex];
+                char   prev_c   = prev_buffer[bufIndex];
+                if(c == prev_c) continue;
                 lcd->setCursor(col, row);
                 lcd->write(c); // Write each character individually
                 lcd->flush();
@@ -82,17 +81,17 @@ namespace core::display::interface{
         }
 
         // Render custom characters at their positions
-        for(size_t i = 0; i < custom_char_positions.size(); i++){
+        for(size_t i = 0; i < custom_char_positions.size(); i++) {
             core::display::interface::char_pos chp = custom_char_positions[i];
-            size_t col = chp.index % character_cols;
-            size_t row = chp.index / character_cols;
+            size_t                             col = chp.index % character_cols;
+            size_t                             row = chp.index / character_cols;
             lcd->setCursor(col, row);
             lcd->write(chp.character);
             lcd->flush();
         }
 
-        char* tmp = prev_buffer;
-        prev_buffer = character_buffer;
+        char *tmp        = prev_buffer;
+        prev_buffer      = character_buffer;
         character_buffer = tmp;
         this->clear();
 
@@ -100,12 +99,12 @@ namespace core::display::interface{
         Wire.flush();
     }
 
-    void LCD_I2C::setBacklight(bool on){
+    void LCD_I2C::setBacklight(bool on) {
         if(on) lcd->backlight();
         else lcd->noBacklight();
     }
 
-    void LCD_I2C::createCustomChars(){
+    void LCD_I2C::createCustomChars() {
         // degree
         byte customChar[] = {
             B11000,
@@ -119,6 +118,5 @@ namespace core::display::interface{
         };
 
         lcd->createChar(core::display::interface::CustomChar::CELSIUS, customChar);
-
     }
-}
+} // namespace core::display::interface

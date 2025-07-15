@@ -3,21 +3,20 @@
 #include <string>
 
 #if defined(ESP32)
-#include <WiFi.h>
+    #include <WiFi.h>
 #elif defined(ESP8266)
-#include <ESP8266WiFi.h>
+    #include <ESP8266WiFi.h>
 #else
-#error "Unsupported platform, please use ESP32 or ESP8266"
+    #error "Unsupported platform, please use ESP32 or ESP8266"
 #endif
 
 #include <WiFiManager.h>
 
-namespace core::wifi
-{
-    void setup();
-    void loop();
+namespace core::wifi {
+    void        setup();
+    void        loop();
 
-    bool isConnected();
-    
+    bool        isConnected();
+
     std::string getStringIP();
-}
+} // namespace core::wifi
