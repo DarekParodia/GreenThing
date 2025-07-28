@@ -17,11 +17,17 @@ namespace modules {
     AHT20::~AHT20() {}
 
     void AHT20::init() {
+        this->failed = false;
+        // Check if AHT20 responds on I2C address 0x38
+        Wire.beginTransmission(0x38);
+        uint8_t error = Wire.endTransmission();
+        if(error != 0)
+            this->failed = true;
     }
 
     void AHT20::loop() {
         // Wire.setClock(400000);
-
+        if(failed) return;
         this->measure();
         this->trigger();
 

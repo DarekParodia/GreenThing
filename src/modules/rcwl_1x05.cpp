@@ -30,6 +30,7 @@ namespace modules {
     }
 
     void RCWL_1x05::loop() {
+        if(failed) return;
         bool newData = sensor->update(); // calling update() repeatedly is crucial in continuous mode
         if(newData) {
             unsigned int distance = sensor->read();

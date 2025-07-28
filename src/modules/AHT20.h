@@ -20,5 +20,6 @@ namespace modules {
         private:
             void trigger();
             void measure();
+            bool failed;
     };
 } // namespace modules
