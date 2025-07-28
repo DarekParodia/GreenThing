@@ -6,6 +6,8 @@
 namespace modules {
     class Temperature : public virtual Module {
         public:
+            Temperature() :
+                Module() {};
             inline double getTemperature() {
                 return temperature;
             }

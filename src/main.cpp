@@ -2,15 +2,19 @@
 
 #include <Arduino.h>
 
-#if defined(USE_API)
-    #include "core/api/api.h"
+#if !defined(I2C_SPEED)
+    #define I2C_SPEED 10000
 #endif
 
-#if defined(USE_WIFI) or defined(USE_API)
-    #ifndef USE_WIFI
+#if defined(USE_MQTT)
+    #if !defined(USE_WIFI) // MQTT needs wifi to work
         #define USE_WIFI
     #endif
-    #include "core/wifi/wifi.h"
+    #include "core/mqtt.h"
+#endif
+
+#if defined(USE_WIFI)
+    #include "core/wifi.h"
 #endif
 
 #if defined(USE_DISPLAY)
@@ -33,11 +37,11 @@ void setup() {
 #ifdef USE_DISPLAY
     core::display::setup();
 #endif
-#ifdef USE_WIFI
+#ifdef USE_WIFI // wifi must initialize before anything related to wifi (mqtt for example)
     core::wifi::setup();
 #endif
-#ifdef USE_API
-    core::api::setup();
+#ifdef USE_MQTT
+    core::mqtt::setup();
 #endif
 
     client::setup();
@@ -53,8 +57,8 @@ void loop() {
 #ifdef USE_WIFI
     core::wifi::loop();
 #endif
-#ifdef USE_API
-    core::api::loop();
+#ifdef USE_MQTT
+    core::mqtt ::loop();
 #endif
 #ifdef USE_DISPLAY
     core::display::loop();

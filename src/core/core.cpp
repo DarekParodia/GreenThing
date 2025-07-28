@@ -1,6 +1,6 @@
 #include "core/core.h"
 #include "core/time.h"
-#include "core/wifi/wifi.h"
+#include "core/wifi.h"
 
 #include <Arduino.h>
 

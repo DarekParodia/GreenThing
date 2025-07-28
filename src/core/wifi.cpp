@@ -52,6 +52,10 @@ namespace core::wifi {
         wifiManager.process();
     }
 
+    void addCustomParameter(WiFiManagerParameter *parameter) {
+        wifiManager.addParameter(parameter);
+    }
+
     bool isConnected() {
         return WiFi.status() == WL_CONNECTED;
     }

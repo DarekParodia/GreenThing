@@ -16,6 +16,7 @@ namespace core::wifi {
     void        setup();
     void        loop();
 
+    void        addCustomParameter(WiFiManagerParameter *parameter);
     bool        isConnected();
 
     std::string getStringIP();

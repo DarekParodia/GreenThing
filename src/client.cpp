@@ -3,7 +3,7 @@
 #include "core/core.h"
 #include "core/display/display.h"
 #include "core/time.h"
-#include "core/wifi/wifi.h"
+#include "core/wifi.h"
 #include "modules/AHT20.h"
 #include "modules/base/humidity.h"
 #include "modules/base/ultrasonic.h"

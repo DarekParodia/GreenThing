@@ -18,13 +18,13 @@ namespace core::display::interface {
 
     class DisplayInterface {
         public:
-            DisplayInterface()    = default;
-            ~DisplayInterface()   = default;
+            DisplayInterface() = default;
+            virtual ~DisplayInterface();
 
-            virtual void init()   = 0;
-            virtual void render() = 0;
+            virtual void init()                = 0;
+            virtual void render()              = 0;
 
-            virtual void setBacklight(bool on);
+            virtual void setBacklight(bool on) = 0;
 
             inline void  welcome() {
                 size_t centerx = character_cols / 2;
@@ -105,6 +105,8 @@ namespace core::display::interface {
                 return (character_cols * cursor_y) + cursor_x;
             }
 
-            virtual void createCustomChars();
+            virtual void createCustomChars() {};
     };
+    // Out-of-line destructor definition to ensure vtable is generated
+    inline DisplayInterface::~DisplayInterface() = default;
 } // namespace core::display::interface
