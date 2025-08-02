@@ -28,12 +28,14 @@ namespace core::mqtt {
     void mqtt_data<T>::publish(std::string data) {
     }
 
-    void setup() {
+    void preInit() {
         core::wifi::addCustomParameter(&custom_mqtt_server);
         core::wifi::addCustomParameter(&custom_mqtt_port);
         core::wifi::addCustomParameter(&custom_mqtt_user);
         core::wifi::addCustomParameter(&custom_mqtt_pass);
     }
+    void init() {}
+    void postInit() {}
     void loop() {
     }
 } // namespace core::mqtt

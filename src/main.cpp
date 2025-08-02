@@ -23,7 +23,17 @@
 
 #include "client.h"
 
+void preInit();
+void init();
+void postInit();
+
 void setup() {
+    preInit();
+    init();
+    postInit();
+}
+
+void preInit() {
     Serial.begin(115200);
     Wire.setClock(I2C_SPEED);
 
@@ -32,8 +42,10 @@ void setup() {
     Serial.println("Starting setup...");
 
     Wire.begin(4, 5);
-    core::setup();
+}
 
+void init() {
+    core::setup();
 #ifdef USE_DISPLAY
     core::display::setup();
 #endif
@@ -43,9 +55,10 @@ void setup() {
 #ifdef USE_MQTT
     core::mqtt::setup();
 #endif
-
     client::setup();
+}
 
+void postInit() {
     Wire.setClock(I2C_SPEED);
 
     Serial.println("Setup complete");

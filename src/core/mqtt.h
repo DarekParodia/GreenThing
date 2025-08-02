@@ -26,7 +26,9 @@ namespace core::mqtt {
             void        publish(std::string data);
     };
 
-    void setup();
+    void preInit();
+    void init();
+    void postInit();
     void loop();
     void reconnect();
 } // namespace core::mqtt
