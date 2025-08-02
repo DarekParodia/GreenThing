@@ -27,13 +27,15 @@ namespace core {
     unsigned long currentUserLoopTime                         = 0;
     unsigned long userDeltaTime                               = 0; // Time in microseconds since the last loop
 
-    // Time
-    const char *ntpServer                                     = "pool.ntp.org";
-    const long  gmtOffset_sec                                 = 3600; // Adjust as needed
-    const int   daylightOffset_sec                            = 0;
-    const char *timezone                                      = "CET-1CEST,M3.5.0/2,M10.5.0/3"; // Central European Time
+    std::string   hostname;
 
-    ESP32Time  *time                                          = new ESP32Time(0);
+    // Time
+    const char *ntpServer          = "pool.ntp.org";
+    const long  gmtOffset_sec      = 3600; // Adjust as needed
+    const int   daylightOffset_sec = 0;
+    const char *timezone           = "CET-1CEST,M3.5.0/2,M10.5.0/3"; // Central European Time
+
+    ESP32Time  *time               = new ESP32Time(0);
 
     bool        syncNTP() {
         if(!core::wifi::isConnected()) return false;
@@ -82,6 +84,22 @@ namespace core {
     }
 
     void setup() {
+        // Setup Hostname
+        char chipIdStr[10];
+#if defined(ESP32)
+        // Use lower 24 bits of MAC address as chip ID (similar to ESP8266 getChipId)
+        uint64_t chipId = ESP.getEfuseMac();
+        sprintf(chipIdStr, "%06X", (uint32_t)(chipId & 0xFFFFFF)); // Convert to hex string
+#elif defined(ESP8266)
+        sprintf(chipIdStr, "%06X", ESP.getChipId()); // Convert chip ID to hex string
+#endif
+
+
+        hostname = std::string(HOSTNAME) + "_" + std::string(chipIdStr);
+
+        Serial.print("Board Hostname: ");
+        Serial.println(hostname.c_str());
+
         // Setup Time.h
         const char *date = __DATE__; // e.g. "Jul  3 2025"
         const char *time = __TIME__; // e.g. "15:24:30"
@@ -195,5 +213,9 @@ namespace core {
 
     std::vector<modules::Module *> getModules() {
         return modules;
+    }
+
+    std::string getHostname() {
+        return hostname;
     }
 } // namespace core

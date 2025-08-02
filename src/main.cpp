@@ -42,6 +42,10 @@ void preInit() {
     Serial.println("Starting setup...");
 
     Wire.begin(4, 5);
+
+#ifdef USE_MQTT
+    core::mqtt::preInit();
+#endif
 }
 
 void init() {
@@ -53,7 +57,7 @@ void init() {
     core::wifi::setup();
 #endif
 #ifdef USE_MQTT
-    core::mqtt::setup();
+    core::mqtt::init();
 #endif
     client::setup();
 }

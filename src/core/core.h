@@ -37,4 +37,5 @@ namespace core {
     void                           removeModule(modules::Module *module);
     unsigned long                  getDeltaTime();
     std::vector<modules::Module *> getModules();
+    std::string                    getHostname();
 } // namespace core

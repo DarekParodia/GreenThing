@@ -2,16 +2,18 @@
 
 #include "core/wifi.h"
 
+
+#if defined(ESP32)
+    #include <WiFi.h>
+#elif defined(ESP8266)
+    #include <ESP8266WiFi.h>
+#endif
+
+#include <PubSubClient.h>
 #include <WiFiManager.h>
 #include <string>
 
 namespace core::mqtt {
-    // Custom parameters
-    WiFiManagerParameter custom_mqtt_server("server", "MQTT Server", mqtt_server, 40);
-    WiFiManagerParameter custom_mqtt_port("port", "MQTT Port", mqtt_port, 6);
-    WiFiManagerParameter custom_mqtt_user("user", "MQTT User", mqtt_user, 40);
-    WiFiManagerParameter custom_mqtt_pass("pass", "MQTT Password", mqtt_pass, 40);
-
     template <typename T>
     class mqtt_data {
         public:
