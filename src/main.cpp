@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/filesystem.h"
 
 #include <Arduino.h>
 
@@ -47,6 +48,8 @@ void preInit() {
 #elif defined(ESP8266)
     Wire.begin(4, 5);
 #endif
+
+    core::filesystem::preInit();
 
 #ifdef USE_MQTT
     core::mqtt::preInit();
