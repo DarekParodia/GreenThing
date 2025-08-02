@@ -1,21 +1,26 @@
 #include "core/core.h"
+#include "core/filesystem.h"
 #include "core/mqtt.h"
 
 namespace core::mqtt {
-    const char *mqtt_serv;
-    const char *mqtt_port;
-    const char *mqtt_user;
-    const char *mqtt_pass;
+    struct mqtt_credentials {
+            char     server[40] = MQTT_SERV;
+            uint16_t port       = MQTT_PORT;
+            char     user[40]   = MQTT_USER;
+            char     pass[40]   = MQTT_PASS;
+    };
+    size_t           credentials_size = sizeof(mqtt_credentials);
+    mqtt_credentials credentials;
 
     // Wifi stuff
     WiFiClient   espClient;
     PubSubClient client(espClient);
 
     // Custom parameters
-    WiFiManagerParameter custom_mqtt_server("server", "MQTT Server", MQTT_SERV, 40);
-    WiFiManagerParameter custom_mqtt_port("port", "MQTT Port", MQTT_PORT, 6);
-    WiFiManagerParameter custom_mqtt_user("user", "MQTT User", MQTT_USER, 40);
-    WiFiManagerParameter custom_mqtt_pass("pass", "MQTT Password", MQTT_PASS, 40);
+    WiFiManagerParameter *custom_mqtt_server;
+    WiFiManagerParameter *custom_mqtt_port;
+    WiFiManagerParameter *custom_mqtt_user;
+    WiFiManagerParameter *custom_mqtt_pass;
 
     template <typename T>
     mqtt_data<T>::mqtt_data(std::string topic) :
@@ -49,19 +54,36 @@ namespace core::mqtt {
 
     void preInit() {
         Serial.println("Adding mqtt parameters to wifi manager");
-        core::wifi::addCustomParameter(&custom_mqtt_server);
-        core::wifi::addCustomParameter(&custom_mqtt_port);
-        core::wifi::addCustomParameter(&custom_mqtt_user);
-        core::wifi::addCustomParameter(&custom_mqtt_pass);
+
+        // read stored credentails
+        core::filesystem::readFile("mqtt.bin", &credentials, &credentials_size);
+
+        // configure parameters
+        char port_str[6];
+        snprintf(port_str, sizeof(port_str), "%u", credentials.port);
+
+        custom_mqtt_server = new WiFiManagerParameter("server", "MQTT Server", credentials.server, 40);
+        custom_mqtt_port   = new WiFiManagerParameter("port", "MQTT Port", port_str, 6);
+        custom_mqtt_user   = new WiFiManagerParameter("user", "MQTT User", credentials.user, 40);
+        custom_mqtt_pass   = new WiFiManagerParameter("pass", "MQTT Password", credentials.pass, 40);
+
+        core::wifi::addCustomParameter(custom_mqtt_server);
+        core::wifi::addCustomParameter(custom_mqtt_port);
+        core::wifi::addCustomParameter(custom_mqtt_user);
+        core::wifi::addCustomParameter(custom_mqtt_pass);
     }
     void init() {}
     void postInit() {
-        mqtt_serv = custom_mqtt_server.getValue();
-        mqtt_port = custom_mqtt_port.getValue();
-        mqtt_user = custom_mqtt_user.getValue();
-        mqtt_pass = custom_mqtt_pass.getValue();
+        // read parameters
+        strncpy(credentials.server, custom_mqtt_server->getValue(), sizeof(credentials.server));
+        credentials.port = static_cast<uint16_t>(atoi(custom_mqtt_port->getValue()));
+        strncpy(credentials.user, custom_mqtt_user->getValue(), sizeof(credentials.user));
+        strncpy(credentials.pass, custom_mqtt_pass->getValue(), sizeof(credentials.pass));
 
-        client.setServer(mqtt_serv, atoi(mqtt_port));
+        // save parameters
+        core::filesystem::writeFile("mqtt.bin", &credentials, &credentials_size);
+
+        client.setServer(credentials.server, credentials.port);
         client.setCallback(mqttCallback);
         reconnect();
     }
@@ -72,7 +94,7 @@ namespace core::mqtt {
 
     void reconnect() {
         if(client.connected()) return;
-        if(client.connect(core::getHostname().c_str(), mqtt_user, mqtt_pass)) {
+        if(client.connect(core::getHostname().c_str(), credentials.user, credentials.pass)) {
             Serial.println("connected to mqtt");
         } else {
             Serial.print("failed connecting to mqtt, rc=");
