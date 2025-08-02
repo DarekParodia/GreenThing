@@ -3,53 +3,87 @@
 #include "core/wifi.h"
 
 #include <Arduino.h>
-
+#if defined(USE_OTA)
+    #include <ArduinoOTA.h>
+#endif
 namespace core::wifi {
     WiFiManager wifiManager;
 
-#if defined(ESP8266)
-    void setup() {
-        WiFi.mode(WIFI_STA);
-        WiFi.setSleepMode(WIFI_NONE_SLEEP);
-        WiFi.setAutoReconnect(true);
-        WiFi.hostname(core::getHostname().c_str()); // ESP8266: setHostname is 'hostname()'
-        wifiManager.setConfigPortalBlocking(true);
-        wifiManager.setConfigPortalTimeout(0);
-        Serial.println("Starting wifi manager...");
-        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
-        } else {
-            Serial.println("Connected to WiFi: " + WiFi.SSID());
-            core::syncNTP();
-            Serial.print("IP address: ");
-            Serial.println(WiFi.localIP());
-        }
-        wifiManager.process();
+// ota
+#if defined(USE_OTA)
+    void setupOTA() {
+        ArduinoOTA.setHostname(core::getHostname().c_str());
+
+        ArduinoOTA.onStart([]() {
+            Serial.println("OTA update starting...");
+        });
+
+        ArduinoOTA.onEnd([]() {
+            Serial.println("\nOTA update complete!");
+        });
+
+        ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+            Serial.printf("OTA Progress: %u%%\r", (progress * 100) / total);
+        });
+
+        ArduinoOTA.onError([](ota_error_t error) {
+            Serial.printf("OTA Error[%u]: ", error);
+        });
+
+        ArduinoOTA.begin();
     }
-#else
+#endif
+
+#if !defined(ESP8266)
     void onWiFiConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
         Serial.println("WiFi connected!");
         Serial.print("IP address: ");
         Serial.println(WiFi.localIP());
         core::syncNTP();
     }
+#endif
+
+    // Helper for common WiFiManager setup
+    void setupWiFiManager() {
+        wifiManager.setConfigPortalBlocking(true);
+        wifiManager.setConfigPortalTimeout(0);
+        Serial.println("Starting wifi manager...");
+        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
+            // Could not connect, portal started
+        } else {
+            Serial.println("Connected to WiFi: " + WiFi.SSID());
+#if defined(ESP8266)
+            core::syncNTP();
+            Serial.print("IP address: ");
+            Serial.println(WiFi.localIP());
+#endif
+        }
+        wifiManager.process();
+    }
 
     void setup() {
         WiFi.mode(WIFI_STA);
+#if defined(ESP8266)
+        WiFi.setSleepMode(WIFI_NONE_SLEEP);
+        WiFi.setAutoReconnect(true);
+        WiFi.hostname(core::getHostname().c_str());
+#else
         WiFi.onEvent(onWiFiConnected, ARDUINO_EVENT_WIFI_STA_GOT_IP);
         WiFi.setAutoReconnect(true);
         WiFi.setAutoConnect(true);
         WiFi.setHostname(core::getHostname().c_str());
-        Serial.println("Starting wifi manager...");
-        wifiManager.setConfigPortalBlocking(true);
-        wifiManager.setConfigPortalTimeout(0);
-        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
-        } else Serial.println("Connected to WiFi: " + WiFi.SSID());
-        wifiManager.process();
-    }
 #endif
+        setupWiFiManager();
+#if defined(USE_OTA)
+        setupOTA();
+#endif
+    }
 
     void loop() {
         wifiManager.process();
+#if defined(USE_OTA)
+        ArduinoOTA.handle();
+#endif
     }
 
     void addCustomParameter(WiFiManagerParameter *parameter) {
