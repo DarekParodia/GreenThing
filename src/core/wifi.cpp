@@ -13,10 +13,10 @@ namespace core::wifi {
         WiFi.setSleepMode(WIFI_NONE_SLEEP);
         WiFi.setAutoReconnect(true);
         WiFi.hostname(core::getHostname().c_str()); // ESP8266: setHostname is 'hostname()'
-        wifiManager.setConfigPortalBlocking(false);
+        wifiManager.setConfigPortalBlocking(true);
         wifiManager.setConfigPortalTimeout(0);
+        Serial.println("Starting wifi manager...");
         if(!wifiManager.autoConnect(core::getHostname().c_str())) {
-            Serial.println("Starting config portal...");
         } else {
             Serial.println("Connected to WiFi: " + WiFi.SSID());
             core::syncNTP();
@@ -39,12 +39,11 @@ namespace core::wifi {
         WiFi.setAutoReconnect(true);
         WiFi.setAutoConnect(true);
         WiFi.setHostname(core::getHostname().c_str());
-        wifiManager.setConfigPortalBlocking(false);
+        Serial.println("Starting wifi manager...");
+        wifiManager.setConfigPortalBlocking(true);
         wifiManager.setConfigPortalTimeout(0);
-        if(!wifiManager.autoConnect(core::getHostname().c_str()))
-            Serial.println("Starting config portal...");
-        else
-            Serial.println("Connected to WiFi: " + WiFi.SSID());
+        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
+        } else Serial.println("Connected to WiFi: " + WiFi.SSID());
         wifiManager.process();
     }
 #endif

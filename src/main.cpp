@@ -23,13 +23,14 @@
 
 #include "client.h"
 
+
 void preInit();
-void init();
+void appInit();
 void postInit();
 
 void setup() {
     preInit();
-    init();
+    appInit();
     postInit();
 }
 
@@ -47,13 +48,12 @@ void preInit() {
     Wire.begin(4, 5);
 #endif
 
-
 #ifdef USE_MQTT
     core::mqtt::preInit();
 #endif
 }
 
-void init() {
+void appInit() {
     core::setup();
 #ifdef USE_DISPLAY
     core::display::setup();

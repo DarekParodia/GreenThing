@@ -48,6 +48,7 @@ namespace core::mqtt {
     }
 
     void preInit() {
+        Serial.println("Adding mqtt parameters to wifi manager");
         core::wifi::addCustomParameter(&custom_mqtt_server);
         core::wifi::addCustomParameter(&custom_mqtt_port);
         core::wifi::addCustomParameter(&custom_mqtt_user);
