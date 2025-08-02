@@ -41,7 +41,12 @@ void preInit() {
     Serial.println();
     Serial.println("Starting setup...");
 
+#if defined(ESP32)
+    Wire.begin(21, 22);
+#elif defined(ESP8266)
     Wire.begin(4, 5);
+#endif
+
 
 #ifdef USE_MQTT
     core::mqtt::preInit();
@@ -64,6 +69,10 @@ void init() {
 
 void postInit() {
     Wire.setClock(I2C_SPEED);
+
+#ifdef USE_MQTT
+    core::mqtt::postInit();
+#endif
 
     Serial.println("Setup complete");
 }

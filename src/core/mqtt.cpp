@@ -65,9 +65,12 @@ namespace core::mqtt {
         reconnect();
     }
     void loop() {
+        // reconnect();
+        client.loop();
     }
 
     void reconnect() {
+        if(client.connected()) return;
         if(client.connect(core::getHostname().c_str(), mqtt_user, mqtt_pass)) {
             Serial.println("connected to mqtt");
         } else {

@@ -84,6 +84,7 @@ namespace core::display::interface {
             }
 
         protected:
+            bool init_failed = false;
             // Dimensions
             size_t  character_cols;
             size_t  character_rows;

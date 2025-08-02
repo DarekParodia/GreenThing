@@ -32,7 +32,12 @@ namespace core::display::interface {
     }
 
     void LCD_I2C::init() {
-        lcd->begin(this->character_cols, this->character_rows);
+        bool success = lcd->begin(this->character_cols, this->character_rows);
+        if(!success) {
+            this->init_failed = true;
+            Serial.println("LCD initialization failed!");
+            return;
+        }
         lcd->clear();
         this->createCustomChars();
         this->welcome();
@@ -40,6 +45,7 @@ namespace core::display::interface {
     }
 
     void LCD_I2C::render() {
+        if(init_failed) return;
         Wire.setClock(100000);
         Wire.flush();
         lcd->flush();
@@ -100,11 +106,13 @@ namespace core::display::interface {
     }
 
     void LCD_I2C::setBacklight(bool on) {
+        if(init_failed) return;
         if(on) lcd->backlight();
         else lcd->noBacklight();
     }
 
     void LCD_I2C::createCustomChars() {
+        if(init_failed) return;
         // degree
         byte customChar[] = {
             B11000,
