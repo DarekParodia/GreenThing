@@ -36,7 +36,10 @@ namespace modules {
 
     void AHT20::userLoop() {
         if(failed) return;
-        Temperature::mqtt_data->update(std::ceil(this->temperature * 10.0) / 10.0);
+#ifdef USE_MQTT
+        Temperature::mqtt_data->update(this->temperature);
+        Humidity::mqtt_data->update(this->humidity);
+#endif
     }
     void AHT20::trigger() {
         // Send measurement command to AHT20 (0xAC, 0x33, 0x00)
