@@ -28,6 +28,7 @@ namespace core {
     unsigned long userDeltaTime                               = 0; // Time in microseconds since the last loop
 
     std::string   hostname;
+    char          chipIdStr[10];
 
     // Time
     const char *ntpServer          = "pool.ntp.org";
@@ -84,18 +85,15 @@ namespace core {
     }
 
     void setup() {
-        // Setup Hostname
-        char chipIdStr[10];
+// Setup Hostname
 #if defined(ESP32)
         // Use lower 24 bits of MAC address as chip ID (similar to ESP8266 getChipId)
         uint64_t chipId = ESP.getEfuseMac();
-        sprintf(chipIdStr, "%06X", (uint32_t)(chipId & 0xFFFFFF)); // Convert to hex string
+        sprintf(chipIdStr, "%06X", (uint32_t) (chipId & 0xFFFFFF)); // Convert to hex string
 #elif defined(ESP8266)
         sprintf(chipIdStr, "%06X", ESP.getChipId()); // Convert chip ID to hex string
 #endif
-
-
-        hostname = std::string(HOSTNAME) + "_" + std::string(chipIdStr);
+        hostname = std::string(HOSTNAME) + "_" + getChipId();
 
         Serial.print("Board Hostname: ");
         Serial.println(hostname.c_str());
@@ -217,5 +215,9 @@ namespace core {
 
     std::string getHostname() {
         return hostname;
+    }
+
+    std::string getChipId() {
+        return std::string(chipIdStr);
     }
 } // namespace core

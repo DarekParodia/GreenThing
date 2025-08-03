@@ -1,7 +1,9 @@
 #pragma once
 
 namespace client {
-    void setup();
+    void preInit();
+    void init();
+    void postInit();
     void loop();
     void render();
 }; // namespace client

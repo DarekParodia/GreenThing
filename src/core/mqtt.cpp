@@ -11,6 +11,7 @@ namespace core::mqtt {
     };
     size_t           credentials_size = sizeof(mqtt_credentials);
     mqtt_credentials credentials;
+    std::string      def_topic;
 
     // Wifi stuff
     WiFiClient   espClient;
@@ -22,34 +23,15 @@ namespace core::mqtt {
     WiFiManagerParameter *custom_mqtt_user;
     WiFiManagerParameter *custom_mqtt_pass;
 
-    template <typename T>
-    mqtt_data<T>::mqtt_data(std::string topic) :
-        topic(topic) {}
-
-    template <typename T>
-    mqtt_data<T>::~mqtt_data() {}
-
-    template <typename T>
-    void mqtt_data<T>::update(T new_data) {
-        prev_data = data;
-        data      = new_data;
-        if(prev_data != data)
-            this->publish(std::to_string(data));
+    void                  mqttCallback(char *topic, byte *payload, unsigned int length) {
     }
 
-    template <>
-    void mqtt_data<std::string>::update(std::string new_data) {
-        prev_data = data;
-        data      = new_data;
-        if(prev_data != data)
-            this->publish(data);
-    }
-
-    template <typename T>
-    void mqtt_data<T>::publish(std::string data) {
-    }
-
-    void mqttCallback(char *topic, byte *payload, unsigned int length) {
+    void mqtt_publish(std::string topic, std::string data) {
+        Serial.print("Publishing mqtt: ");
+        Serial.print((def_topic + topic).c_str());
+        Serial.print(" | ");
+        Serial.println(data.c_str());
+        client.publish((def_topic + topic).c_str(), data.c_str());
     }
 
     void preInit() {
@@ -72,7 +54,9 @@ namespace core::mqtt {
         core::wifi::addCustomParameter(custom_mqtt_user);
         core::wifi::addCustomParameter(custom_mqtt_pass);
     }
-    void init() {}
+    void init() {
+        def_topic = std::string(HOSTNAME) + "/" + core::getChipId() + "/";
+    }
     void postInit() {
         // read parameters
         strncpy(credentials.server, custom_mqtt_server->getValue(), sizeof(credentials.server));

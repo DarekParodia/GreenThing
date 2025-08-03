@@ -100,7 +100,7 @@ void wateringCycleOff() {
 core::timeout_t *timeout = nullptr;
 
 namespace client {
-    void setup() {
+    void preInit() {
         core::addModule(&button);
         core::addModule(&solenoid);
         core::addModule(&flow_meter);
@@ -109,8 +109,12 @@ namespace client {
         core::addModule(&aht20);
 
         currentVolMeasurment = flow_meter.startVolumeMeasurment(&currentVolume);
+        delay(200);
         wateringCycleOff();
-
+    }
+    void init() {
+    }
+    void postInit() {
         disp->clear();
         // disp->setBacklight(false);
     }

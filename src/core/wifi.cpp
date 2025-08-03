@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/display/display.h"
 #include "core/time.h"
 #include "core/wifi.h"
 
@@ -16,6 +17,7 @@ namespace core::wifi {
 
         ArduinoOTA.onStart([]() {
             Serial.println("OTA update starting...");
+            core::display::displayInterface->clear();
         });
 
         ArduinoOTA.onEnd([]() {
@@ -23,7 +25,12 @@ namespace core::wifi {
         });
 
         ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-            Serial.printf("OTA Progress: %u%%\r", (progress * 100) / total);
+            char buf[32];
+            snprintf(buf, sizeof(buf), "OTA: %u%%", (progress * 100) / total);
+            Serial.println(buf);
+            core::display::displayInterface->setCursor(10, 1);
+            core::display::displayInterface->setTextCentered(std::string(buf));
+            core::display::loop();
         });
 
         ArduinoOTA.onError([](ota_error_t error) {

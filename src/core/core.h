@@ -38,4 +38,5 @@ namespace core {
     unsigned long                  getDeltaTime();
     std::vector<modules::Module *> getModules();
     std::string                    getHostname();
+    std::string                    getChipId();
 } // namespace core

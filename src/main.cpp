@@ -49,15 +49,17 @@ void preInit() {
     Wire.begin(4, 5);
 #endif
 
+    core::setup();
     core::filesystem::preInit();
 
 #ifdef USE_MQTT
     core::mqtt::preInit();
 #endif
+
+    client::preInit();
 }
 
 void appInit() {
-    core::setup();
 #ifdef USE_DISPLAY
     core::display::setup();
 #endif
@@ -67,7 +69,7 @@ void appInit() {
 #ifdef USE_MQTT
     core::mqtt::init();
 #endif
-    client::setup();
+    client::init();
 }
 
 void postInit() {
@@ -76,7 +78,7 @@ void postInit() {
 #ifdef USE_MQTT
     core::mqtt::postInit();
 #endif
-
+    client::postInit();
     Serial.println("Setup complete");
 }
 

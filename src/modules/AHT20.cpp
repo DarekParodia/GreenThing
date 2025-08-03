@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-
+#include <cmath>
 
 namespace modules {
     AHT20::AHT20(std::string name) :
@@ -35,6 +35,8 @@ namespace modules {
     }
 
     void AHT20::userLoop() {
+        if(failed) return;
+        Temperature::mqtt_data->update(std::ceil(this->temperature * 10.0) / 10.0);
     }
     void AHT20::trigger() {
         // Send measurement command to AHT20 (0xAC, 0x33, 0x00)
