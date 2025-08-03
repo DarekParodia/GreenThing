@@ -56,6 +56,7 @@ namespace core::mqtt {
             T             prev_data;
             unsigned long last_update     = 0;
             unsigned long update_interval = 0;
+            bool          hass            = false;
             void          publish(std::string data);
             bool          process_publish(T new_data);
     };
@@ -78,12 +79,15 @@ namespace core::mqtt {
     // Class definition (linker didn't liked that it was in .cpp file)
     template <typename T>
     inline mqtt_data<T>::mqtt_data(std::string topic) :
-        topic(topic) {}
+        topic(topic) {
+        mqtt_bases.push_back(this);
+    }
 
     template <typename T>
     inline mqtt_data<T>::mqtt_data(std::string topic, hass_data hdata) :
         topic(topic),
         hdata(hdata) {
+        this->hass = true;
         mqtt_bases.push_back(this);
     }
 
@@ -91,13 +95,16 @@ namespace core::mqtt {
     inline mqtt_data<T>::mqtt_data(std::string topic, unsigned long update_interval) :
         topic(topic),
         update_interval(update_interval),
-        hdata() {}
+        hdata() {
+        mqtt_bases.push_back(this);
+    }
 
     template <typename T>
     inline mqtt_data<T>::mqtt_data(std::string topic, unsigned long update_interval, hass_data hdata) :
         topic(topic),
         update_interval(update_interval),
         hdata(hdata) {
+        this->hass = true;
         mqtt_bases.push_back(this);
     }
 
@@ -118,6 +125,7 @@ namespace core::mqtt {
 
     template <typename T>
     inline void mqtt_data<T>::annouceHass() {
+        if(!hass) return;
         JsonDocument doc;
         doc["name"]                = hdata.name.c_str();
         doc["state_topic"]         = (def_topic + this->topic).c_str();

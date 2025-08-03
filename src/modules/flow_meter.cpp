@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/time.h"
 #include "flow_meter.h"
 
 #include <Arduino.h>
@@ -70,6 +71,19 @@ namespace modules {
         this->userLoopFlowRate         = this->userLoopFrequency / this->freqPerFlowFactor;               // Flow rate in liters per minute
         this->userLoopVolume           = this->volume;
         this->volume                   = 0.0; // Reset volume for the next user loop
+
+        if(core::time->getDay() != lastDay) {
+            lastDay             = core::time->getDay();
+            this->volumeLast24H = 2.0;
+        }
+
+        this->volumeLast24H += this->userLoopVolume;
+
+// update mqtt
+#ifdef USE_MQTT
+        this->mqtt_vol->update(volumeLast24H);
+        this->mqtt_flow->update(userLoopFlowRate);
+#endif
 
         // Serial.print("Pulses: ");
         // Serial.print(this->lastPulsesPerUserLoop);

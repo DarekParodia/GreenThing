@@ -193,7 +193,7 @@ namespace client {
         snprintf(buf, sizeof(buf), "%.1fL/min", flow_meter.getFlowRate());
         disp->setText(buf);
 
-        snprintf(buf, sizeof(buf), "%.1fL", currentVolume);
+        snprintf(buf, sizeof(buf), "%.1fL", flow_meter.getVolume24H());
         std::string vol_str = std::string(buf);
         disp->setCursor(disp->getCols() - vol_str.size(), 1);
         disp->setText(vol_str);

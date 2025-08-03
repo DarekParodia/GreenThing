@@ -70,7 +70,7 @@ namespace core::mqtt {
         client.setServer(credentials.server, credentials.port);
         client.setCallback(mqttCallback);
         reconnect();
-
+        delay(100);
         for(int i = 0; i < mqtt_bases.size(); i++)
             mqtt_bases[i]->annouceHass();
     }
