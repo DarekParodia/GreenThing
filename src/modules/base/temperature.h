@@ -16,7 +16,8 @@ namespace modules {
         protected:
             double temperature = 0.0; // Current temperature value in celsius
 #ifdef USE_MQTT
-            core::mqtt::mqtt_data<double> *mqtt_data = new core::mqtt::mqtt_data<double>(Module::getName() + "/temperature", 10000);
+            core::mqtt::hass_data          hd        = { Module::getName() + "_temperature", "°C", "temperature" };
+            core::mqtt::mqtt_data<double> *mqtt_data = new core::mqtt::mqtt_data<double>(Module::getName() + "/temperature", 10000, hd);
 #endif
     };
 } // namespace modules

@@ -1,4 +1,3 @@
-#include "core/core.h"
 #include "core/filesystem.h"
 #include "core/mqtt.h"
 
@@ -9,9 +8,10 @@ namespace core::mqtt {
             char     user[40]   = MQTT_USER;
             char     pass[40]   = MQTT_PASS;
     };
-    size_t           credentials_size = sizeof(mqtt_credentials);
-    mqtt_credentials credentials;
-    std::string      def_topic;
+    size_t                        credentials_size = sizeof(mqtt_credentials);
+    mqtt_credentials              credentials;
+    std::string                   def_topic  = "";
+    std::vector<mqtt_data_base *> mqtt_bases = {};
 
     // Wifi stuff
     WiFiClient   espClient;
@@ -70,6 +70,9 @@ namespace core::mqtt {
         client.setServer(credentials.server, credentials.port);
         client.setCallback(mqttCallback);
         reconnect();
+
+        for(int i = 0; i < mqtt_bases.size(); i++)
+            mqtt_bases[i]->annouceHass();
     }
     void loop() {
         // reconnect();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/mqtt.h"
 #include "modules/base/module.h"
 
 #include <string>
@@ -55,6 +56,10 @@ namespace modules {
             // Custom Measurments
             std::vector<double *> volumeMeasurments;
 
-            void                  registerPulse();
+#ifdef USE_MQTT
+            core::mqtt::mqtt_data<double> *mqtt_data = new core::mqtt::mqtt_data<double>(Module::getName() + "/flow", 10000);
+#endif
+
+            void registerPulse();
     };
 } // namespace modules
