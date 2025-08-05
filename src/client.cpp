@@ -95,6 +95,7 @@ void wateringCycleOn() {
 void wateringCycleOff() {
     closingFlow = flow_meter.getFlowRate();
     solenoid.close();
+    button.changeState();
     lastValveClose = millis();
 }
 core::timeout_t *timeout = nullptr;

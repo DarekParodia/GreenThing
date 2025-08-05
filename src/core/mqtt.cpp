@@ -23,14 +23,22 @@ namespace core::mqtt {
     WiFiManagerParameter *custom_mqtt_user;
     WiFiManagerParameter *custom_mqtt_pass;
 
-    void                  mqttCallback(char *topic, byte *payload, unsigned int length) {
+    //
+    void mqttCallback(char *topic, byte *payload, unsigned int length) {
+        for(int i = 0; i < mqtt_bases.size(); i++) {
+            mqtt_data_base *base       = mqtt_bases[i];
+            std::string     full_topic = def_topic + base->getTopic();
+
+            if(full_topic == topic)
+                base->receive(payload, length);
+        }
     }
 
     void mqtt_publish(std::string topic, std::string data) {
-        Serial.print("Publishing mqtt: ");
-        Serial.print((def_topic + topic).c_str());
-        Serial.print(" | ");
-        Serial.println(data.c_str());
+        // Serial.print("Publishing mqtt: ");
+        // Serial.print((def_topic + topic).c_str());
+        // Serial.print(" | ");
+        // Serial.println(data.c_str());
         client.publish((def_topic + topic).c_str(), data.c_str());
     }
 
@@ -72,7 +80,7 @@ namespace core::mqtt {
         reconnect();
         delay(100);
         for(int i = 0; i < mqtt_bases.size(); i++)
-            mqtt_bases[i]->annouceHass();
+            mqtt_bases[i]->init();
     }
     void loop() {
         // reconnect();

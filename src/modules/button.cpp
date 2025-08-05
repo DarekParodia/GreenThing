@@ -23,13 +23,19 @@ namespace modules {
 
         if(debounce()) {
             if(bistable) {
-                if(readValue != lastState && readValue == inverted)
-                    state = !state;    // Toggle state
+                if(readValue != lastState && readValue == inverted) {
+                    state      = !state; // Toggle state
+                    mqtt_state = state;
+#ifdef USE_MQTT
+                    mqtt_data->update(mqtt_state);
+#endif
+                }
                 lastState = readValue; // Update last state
             } else {
                 state = readValue;
             }
         }
+        state = mqtt_state;
     }
 
     void Button::userLoop() {
