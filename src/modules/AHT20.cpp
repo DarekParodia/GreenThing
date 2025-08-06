@@ -37,8 +37,8 @@ namespace modules {
     void AHT20::userLoop() {
         if(failed) return;
 #ifdef USE_MQTT
-        Temperature::mqtt_data->update(this->temperature);
-        Humidity::mqtt_data->update(this->humidity);
+        Temperature::mqtt_data->update(this->temperature, true);
+        Humidity::mqtt_data->update(this->humidity, true);
 #endif
     }
     void AHT20::trigger() {

@@ -50,8 +50,8 @@ namespace core::mqtt {
             mqtt_data(std::string topic, T *update_data); // I should start adding comments because it becomes confusing which constructor does what
             mqtt_data(std::string topic, T *update_data, unsigned long update_interval);
             ~mqtt_data();
-            void        update(T new_data);
-            void        update();
+            void        update(T new_data, bool retain = false);
+            void        update(bool retain = false);
             void        init();
             void        receive(byte *payload, unsigned int length);
             std::string getTopic();
@@ -66,7 +66,7 @@ namespace core::mqtt {
             unsigned long update_interval = 0;
             bool          hass            = false;
             bool          initialized     = false;
-            void          publish(std::string data);
+            void          publish(std::string data, bool retain);
             void          subscribe();
             bool          process_publish(T new_data);
             T             convertFromString(const std::string &str);
@@ -79,7 +79,7 @@ namespace core::mqtt {
     extern PubSubClient                  client;
 
     // functions
-    void mqtt_publish(std::string topic, std::string data);
+    void mqtt_publish(std::string topic, std::string data, bool retain);
     void mqtt_subscribe();
 
     void preInit();
@@ -139,30 +139,30 @@ namespace core::mqtt {
     inline mqtt_data<T>::~mqtt_data() {}
 
     template <typename T>
-    inline void mqtt_data<T>::update(T new_data) {
+    inline void mqtt_data<T>::update(T new_data, bool retain) {
         if(process_publish(new_data))
-            this->publish(std::to_string(data));
+            this->publish(std::to_string(data), retain);
     }
 
     template <>
-    inline void mqtt_data<std::string>::update(std::string new_data) {
+    inline void mqtt_data<std::string>::update(std::string new_data, bool retain) {
         if(process_publish(new_data))
-            this->publish(data);
+            this->publish(data, retain);
     }
 
     template <typename T>
-    inline void mqtt_data<T>::update() {
+    inline void mqtt_data<T>::update(bool retain) {
         if(this->update_data == nullptr) return;
         T new_data = *this->update_data;
         if(process_publish(new_data))
-            this->publish(std::to_string(data));
+            this->publish(std::to_string(data), retain);
     }
     template <>
-    inline void mqtt_data<std::string>::update() {
+    inline void mqtt_data<std::string>::update(bool retain) {
         if(this->update_data == nullptr) return;
         std::string new_data = *this->update_data;
         if(process_publish(new_data))
-            this->publish(data);
+            this->publish(data, retain);
     }
 
     template <typename T>
@@ -179,7 +179,7 @@ namespace core::mqtt {
             std::string output;
             serializeJson(doc, output);
 
-            client.publish((std::string(BASE_DISCOVERY) + unique_id + "/config").c_str(), output.c_str());
+            client.publish((std::string(BASE_DISCOVERY) + unique_id + "/config").c_str(), output.c_str(), true);
         }
         this->subscribe();
         initialized = true;
@@ -199,8 +199,8 @@ namespace core::mqtt {
     }
 
     template <typename T>
-    inline void mqtt_data<T>::publish(std::string data) {
-        mqtt_publish(this->topic, data);
+    inline void mqtt_data<T>::publish(std::string data, bool retain) {
+        mqtt_publish(this->topic, data, retain);
     }
     template <typename T>
     inline void mqtt_data<T>::subscribe() {
