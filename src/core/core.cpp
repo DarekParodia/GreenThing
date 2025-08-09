@@ -169,10 +169,10 @@ namespace core {
             module->userLoop();
             module->endUserLoop();
 
-            Serial.print(module->getName().c_str());
-            Serial.printf(": %d us|", module->getLoopDelta());
+            // Serial.print(module->getName().c_str());
+            // Serial.printf(": %d us|", module->getLoopDelta());
         }
-        Serial.println("");
+        // Serial.println("");
     }
     void delayMicroseconds(unsigned long delay) {
         unsigned long startTime = micros();

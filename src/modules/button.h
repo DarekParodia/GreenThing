@@ -14,7 +14,7 @@ namespace modules {
             void        userLoop() override;
 
             inline void changeState() {
-                this->mqtt_state = !state;
+                // this->mqtt_state = !state;
             }
 
             bool isPressed() const;
@@ -30,8 +30,8 @@ namespace modules {
             unsigned long debounceDelay    = 10; // Debounce time in milliseconds
             int           mqtt_state;
 #ifdef USE_MQTT
-
-            core::mqtt::mqtt_data<int> *mqtt_data = new core::mqtt::mqtt_data<int>(Module::getName() + "/state", &mqtt_state);
+            core::mqtt::hass_data       hd        = { core::mqtt::HassType::SWITCH, Module::getName() + "_state", "", "switch" };
+            core::mqtt::mqtt_data<int> *mqtt_data = new core::mqtt::mqtt_data<int>(Module::getName() + "/state", &mqtt_state, hd);
 #endif
     };
 } // namespace modules

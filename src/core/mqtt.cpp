@@ -35,11 +35,16 @@ namespace core::mqtt {
     }
 
     void mqtt_publish(std::string topic, std::string data, bool retain) {
-        // Serial.print("Publishing mqtt: ");
-        // Serial.print((def_topic + topic).c_str());
-        // Serial.print(" | ");
-        // Serial.println(data.c_str());
+        Serial.print("Publishing mqtt: ");
+        Serial.print((def_topic + topic).c_str());
+        Serial.print(" | ");
+        Serial.println(data.c_str());
         client.publish((def_topic + topic).c_str(), data.c_str(), retain);
+    }
+
+    std::string hass_type_to_string(HassType type) {
+        auto it = HassTypeToString.find(type);
+        return it != HassTypeToString.end() ? it->second : "unknown";
     }
 
     void preInit() {

@@ -74,7 +74,7 @@ namespace modules {
 
         if(core::time->getDay() != lastDay) {
             lastDay             = core::time->getDay();
-            this->volumeLast24H = 2.0;
+            this->volumeLast24H = 0.0;
         }
 
         this->volumeLast24H += this->userLoopVolume;
