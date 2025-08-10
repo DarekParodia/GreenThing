@@ -113,6 +113,7 @@ namespace core::mqtt {
     void        mqtt_publish(std::string topic, std::string data, bool retain);
     void        mqtt_subscribe();
     std::string hass_type_to_string(HassType type);
+    bool        isConnected();
 
     void        preInit();
     void        init();
@@ -248,7 +249,7 @@ namespace core::mqtt {
             client.publish((std::string(BASE_DISCOVERY) + hass_type_to_string(hdata.type) + "/" + unique_id + "/config").c_str(), output.c_str(), true);
             Serial.printf("Register hass at: %s\n With payload: %s\n", (std::string(BASE_DISCOVERY) + hass_type_to_string(hdata.type) + "/" + unique_id + "/config").c_str(), output.c_str());
         }
-        this->publish(std::string(""), false);
+        // this->publish(std::string(""), false);
         this->subscribe();
         initialized = true;
     }
@@ -278,17 +279,42 @@ namespace core::mqtt {
 
     template <typename T>
     inline bool mqtt_data<T>::process_publish(T new_data) {
-        prev_data = data;
-        data      = new_data;
-        if(update_interval == 0)
-            return prev_data != data;
-        else {
+        static constexpr double EPSILON = 0.0001; // tolerance for floats
+
+        // Always publish the very first value
+        if(!initialized) {
+            data        = new_data;
+            prev_data   = new_data;
+            initialized = true;
+            last_update = millis();
+            return true;
+        }
+
+        bool changed;
+        if constexpr(std::is_floating_point_v<T>) {
+            // Compare floats with tolerance
+            changed = fabs(new_data - data) > EPSILON;
+        } else {
+            // Normal comparison for non-floats
+            changed = (new_data != data);
+        }
+
+        if(update_interval == 0) {
+            if(changed) {
+                prev_data = data;
+                data      = new_data;
+                return true;
+            }
+        } else {
             unsigned long now = millis();
-            if(now >= last_update + update_interval && prev_data != data) {
+            if(now >= last_update + update_interval && changed) {
+                prev_data   = data;
+                data        = new_data;
                 last_update = now;
                 return true;
             }
         }
+
         return false;
     }
 

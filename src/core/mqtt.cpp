@@ -47,6 +47,10 @@ namespace core::mqtt {
         return it != HassTypeToString.end() ? it->second : "unknown";
     }
 
+    bool isConnected() {
+        return client.connected();
+    }
+
     void preInit() {
         Serial.println("Adding mqtt parameters to wifi manager");
 
@@ -82,13 +86,17 @@ namespace core::mqtt {
 
         client.setServer(credentials.server, credentials.port);
         client.setCallback(mqttCallback);
-        reconnect();
-        delay(100);
+
+        while(!client.connected()) {
+            reconnect();
+            delay(100);
+        }
+
         for(int i = 0; i < mqtt_bases.size(); i++)
             mqtt_bases[i]->init();
     }
     void loop() {
-        // reconnect();
+        reconnect();
         client.loop();
     }
 

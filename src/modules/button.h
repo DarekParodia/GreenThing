@@ -9,13 +9,11 @@ namespace modules {
             Button(std::string name, int pin, bool inverted = false, bool bistable = false);
             ~Button();
 
-            void        init() override;
-            void        loop() override;
-            void        userLoop() override;
+            void init() override;
+            void loop() override;
+            void userLoop() override;
 
-            inline void changeState() {
-                // this->mqtt_state = !state;
-            }
+            void setState(bool state);
 
             bool isPressed() const;
 

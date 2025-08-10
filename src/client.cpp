@@ -38,25 +38,30 @@ byte char_litersPerMinute[] = {
     B10001
 };
 
-bool         prevButton              = false;
-int          currentVolMeasurment    = -1;
-double       currentVolume           = 0.0;
+bool         prevButton                                = false;
+int          currentVolMeasurment                      = -1;
+double       currentVolume                             = 0.0;
 
-const double containerVolume         = 1000.0; // Liters
-const double containerHeight         = 100.0;  // Centimeter
+const double containerVolume                           = 1000.0; // Liters
+const double containerHeight                           = 100.0;  // Centimeter
 
 // SAFETY
-const double  maxLiters              = 10.0;
-const double  secondsAfterCloseCheck = 15.0;
-const double  secondsPerCloseTry     = 7.5;
-const double  flowTreshold           = 5.0;
-bool          _alarm                 = false;
+double                         maxLiters               = 10.0;
+const double                   secondsAfterCloseCheck  = 15.0;
+const double                   secondsPerCloseTry      = 7.5;
+const double                   flowTreshold            = 5.0;
+bool                           _alarm                  = false;
 
-unsigned long lastValveClose         = 0;
-unsigned long lastValveCloseTry      = 0;
-double        closingFlow            = 0;
+unsigned long                  lastValveClose          = 0;
+unsigned long                  lastValveCloseTry       = 0;
+double                         closingFlow             = 0;
 
-bool          prevSolenoid           = false;
+bool                           prevSolenoid            = false;
+
+core::mqtt::hass_data          hd                      = { "volume_alarm_water_volume", "L", "water" };
+
+core::mqtt::mqtt_data<double> *mqtt_volume_alarm       = new core::mqtt::mqtt_data<double>("volume_alarm/value", &maxLiters);
+core::mqtt::mqtt_data<double> *mqtt_volume_alarm_water = new core::mqtt::mqtt_data<double>("volume_alarm/water_volume", 1000, hd);
 
 // s
 void alarm() {
@@ -68,6 +73,8 @@ void dealarm() {
 }
 
 void alarmCheck() {
+    mqtt_volume_alarm_water->update(currentVolume);
+
     // Solenoid not closed
     if(millis() >= lastValveClose + (secondsAfterCloseCheck * 1000.0) &&
        !solenoid.isOpen() && flow_meter.getFlowRate() - closingFlow > flowTreshold)
@@ -95,7 +102,7 @@ void wateringCycleOn() {
 void wateringCycleOff() {
     closingFlow = flow_meter.getFlowRate();
     solenoid.close();
-    button.changeState();
+    button.setState(false);
     lastValveClose = millis();
 }
 core::timeout_t *timeout = nullptr;
@@ -222,5 +229,12 @@ namespace client {
             disp->setText("Wl ");
         else
             disp->setText("Wyl");
+
+        std::string wifi        = core::wifi::isConnected() ? "W" : " ";
+        std::string mqtt        = core::mqtt::isConnected() ? "Q" : " ";
+
+        std::string connections = wifi + " " + mqtt;
+        disp->setCursor(disp->getCols() - connections.size(), 3);
+        disp->setText(connections);
     }
 } // namespace client

@@ -28,14 +28,16 @@ namespace modules {
     void AHT20::loop() {
         // Wire.setClock(400000);
         if(failed) return;
-        this->measure();
-        this->trigger();
+        // this->measure();
+        // this->trigger();
 
         // Wire.setClock(I2C_SPEED);
     }
 
     void AHT20::userLoop() {
         if(failed) return;
+        this->measure();
+        this->trigger();
 #ifdef USE_MQTT
         Temperature::mqtt_data->update(this->temperature, true);
         Humidity::mqtt_data->update(this->humidity, true);

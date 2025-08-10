@@ -81,23 +81,18 @@ namespace modules {
 
 // update mqtt
 #ifdef USE_MQTT
-        this->mqtt_vol->update(volumeLast24H);
-        this->mqtt_flow->update(userLoopFlowRate);
+        this->mqtt_vol->update(volumeLast24H, true);
+        this->mqtt_flow->update(userLoopFlowRate, true);
 #endif
 
-        // Serial.print("Pulses: ");
-        // Serial.print(this->lastPulsesPerUserLoop);
-        // Serial.print(" | Frequency: ");
-        // Serial.print(this->userLoopFrequency);
-        // Serial.print(" Hz | Flow Rate: ");
-        // Serial.print(this->userLoopFlowRate);
-        // Serial.print(" L/min | Volume: ");
-        // Serial.print(this->userLoopVolume);
-        // Serial.print(" L | Time: ");
-        // Serial.print(core::userDeltaTime / 1000.0);
-        // Serial.print(" ms | Loop Time: ");
-        // Serial.print(core::deltaTime / 1000.0);
-        // Serial.println(" ms");
+        // Serial.printf(
+        // "Pulses: %d | Frequency: %f Hz | Flow Rate: %f L/min | Volume: %.2f L | Time: %.2f ms | Loop Time: %.2f ms\n",
+        // this->lastPulsesPerUserLoop,
+        // this->userLoopFrequency,
+        // this->userLoopFlowRate,
+        // this->userLoopVolume,
+        // core::userDeltaTime / 1000.0,
+        // core::deltaTime / 1000.0);
     }
 
     void FlowMeter::registerPulse() {
