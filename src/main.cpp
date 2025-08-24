@@ -2,6 +2,7 @@
 #include "core/filesystem.h"
 
 #include <Arduino.h>
+#include <Wire.h>
 
 #if !defined(I2C_SPEED)
     #define I2C_SPEED 10000
