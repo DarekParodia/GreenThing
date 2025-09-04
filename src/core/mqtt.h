@@ -9,6 +9,7 @@
     #include <ESP8266WiFi.h>
 #endif
 
+#include <type_traits>
 #include <unordered_map>
 
 #include <ArduinoJson.h>
@@ -113,6 +114,7 @@ namespace core::mqtt {
     void        mqtt_publish(std::string topic, std::string data, bool retain);
     void        mqtt_subscribe();
     std::string hass_type_to_string(HassType type);
+
     bool        isConnected();
 
     void        preInit();
