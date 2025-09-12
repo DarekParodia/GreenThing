@@ -52,13 +52,15 @@ namespace core::wifi {
 
     // Helper for common WiFiManager setup
     void setupWiFiManager() {
-        wifiManager.setConfigPortalBlocking(true);
-        wifiManager.setConfigPortalTimeout(0);
-        Serial.println("Starting wifi manager...");
-        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
-            // Could not connect, portal started
+        wifiManager.setConfigPortalBlocking(false);
+
+        Serial.println("Starting WiFi Manager...");
+        if(WiFi.status() != WL_CONNECTED) {
+            // Start non-blocking portal
+            if(!wifiManager.startConfigPortal(core::getHostname().c_str()))
+                Serial.println("Config portal started. Waiting for user input...");
         } else {
-            Serial.println("Connected to WiFi: " + WiFi.SSID());
+            Serial.println("Already connected to WiFi: " + WiFi.SSID());
 #if defined(ESP8266)
             core::syncNTP();
             Serial.print("IP address: ");

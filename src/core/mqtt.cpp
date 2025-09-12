@@ -87,7 +87,10 @@ namespace core::mqtt {
         client.setServer(credentials.server, credentials.port);
         client.setCallback(mqttCallback);
 
-        while(!client.connected()) {
+        unsigned long       startAttemptTime = millis();
+        const unsigned long timeout          = 5000; // 5 seconds
+
+        while(millis() - startAttemptTime < timeout && !client.connected()) {
             reconnect();
             delay(100);
         }
@@ -96,7 +99,13 @@ namespace core::mqtt {
             mqtt_bases[i]->init();
     }
     void loop() {
-        reconnect();
+        static unsigned long lastRecconect = millis();
+        const unsigned long  timeout       = 15000; // 15 seconds
+
+        if(millis() - lastRecconect > timeout && !client.connected()) {
+            reconnect();
+            lastRecconect = millis();
+        }
         client.loop();
     }
 
@@ -104,9 +113,14 @@ namespace core::mqtt {
         if(client.connected()) return;
         if(client.connect(core::getHostname().c_str(), credentials.user, credentials.pass)) {
             Serial.println("connected to mqtt");
+            for(int i = 0; i < mqtt_bases.size(); i++) {
+                auto base = mqtt_bases[i];
+                base->init();
+            }
+
         } else {
             Serial.print("failed connecting to mqtt, rc=");
-            Serial.print(client.state());
+            Serial.println(client.state());
         }
     }
 } // namespace core::mqtt
