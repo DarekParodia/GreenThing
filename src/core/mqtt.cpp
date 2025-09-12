@@ -113,6 +113,11 @@ namespace core::mqtt {
         if(client.connected()) return;
         if(client.connect(core::getHostname().c_str(), credentials.user, credentials.pass)) {
             Serial.println("connected to mqtt");
+            for(int i = 0; i < mqtt_bases.size(); i++) {
+                auto base = mqtt_bases[i];
+                base->init();
+            }
+
         } else {
             Serial.print("failed connecting to mqtt, rc=");
             Serial.println(client.state());
