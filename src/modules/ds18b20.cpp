@@ -35,7 +35,8 @@ namespace modules {
         this->sensor->requestTemperatures();
     }
     void DS18B20::measure() {
-        float tempC       = sensor->getTempCByIndex(0); // Read first sensor
-        this->temperature = (double) tempC;
+        float tempC = sensor->getTempCByIndex(0); // Read first sensor
+        if(tempC > -120.0f)
+            this->temperature = (double) tempC;
     }
 } // namespace modules
