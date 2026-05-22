@@ -111,15 +111,33 @@ namespace core::mqtt {
 
     void reconnect() {
         if(client.connected()) return;
-        if(client.connect(core::getHostname().c_str(), credentials.user, credentials.pass)) {
-            Serial.println("connected to mqtt");
+
+        // Check WiFi connection first
+        if(WiFi.status() != WL_CONNECTED) {
+            Serial.println("MQTT: WiFi not connected, skipping reconnect");
+            return;
+        }
+
+        Serial.print("Attempting MQTT connection to ");
+        Serial.print(credentials.server);
+        Serial.print(":");
+        Serial.println(credentials.port);
+
+        bool connected;
+        // Check if username is empty - if so, connect without auth
+        if(strlen(credentials.user) == 0)
+            connected = client.connect(core::getHostname().c_str());
+        else
+            connected = client.connect(core::getHostname().c_str(), credentials.user, credentials.pass);
+
+        if(connected) {
+            Serial.println("Connected to MQTT");
             for(int i = 0; i < mqtt_bases.size(); i++) {
                 auto base = mqtt_bases[i];
                 base->init();
             }
-
         } else {
-            Serial.print("failed connecting to mqtt, rc=");
+            Serial.print("MQTT connection failed, rc=");
             Serial.println(client.state());
         }
     }

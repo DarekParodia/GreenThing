@@ -1,7 +1,8 @@
+#include "core/wifi.h"
+
 #include "core/core.h"
 #include "core/display/display.h"
 #include "core/time.h"
-#include "core/wifi.h"
 
 #include <Arduino.h>
 #if defined(USE_OTA)
@@ -52,22 +53,22 @@ namespace core::wifi {
 
     // Helper for common WiFiManager setup
     void setupWiFiManager() {
-        wifiManager.setConfigPortalBlocking(false);
+        wifiManager.setConfigPortalTimeout(180); // 3 minute timeout for config portal
+        wifiManager.setConnectTimeout(30);       // 30 second timeout for connection attempts
 
         Serial.println("Starting WiFi Manager...");
-        if(WiFi.status() != WL_CONNECTED) {
-            // Start non-blocking portal
-            if(!wifiManager.startConfigPortal(core::getHostname().c_str()))
-                Serial.println("Config portal started. Waiting for user input...");
+
+        // Blocking autoConnect - will open config portal if no saved credentials
+        if(!wifiManager.autoConnect(core::getHostname().c_str())) {
+            Serial.println("Failed to connect to WiFi, continuing offline...");
         } else {
-            Serial.println("Already connected to WiFi: " + WiFi.SSID());
-#if defined(ESP8266)
-            core::syncNTP();
+            Serial.println("Connected to WiFi: " + WiFi.SSID());
             Serial.print("IP address: ");
             Serial.println(WiFi.localIP());
+#if defined(ESP8266)
+            core::syncNTP();
 #endif
         }
-        wifiManager.process();
     }
 
     void setup() {
@@ -90,6 +91,27 @@ namespace core::wifi {
 
     void loop() {
         wifiManager.process();
+
+        // Actively monitor WiFi and attempt reconnection with exponential backoff
+        static unsigned long lastReconnectAttempt = 0;
+        static int           reconnectAttempts    = 0;
+        const unsigned long  backoffTimes[]       = { 1000, 5000, 15000, 30000, 60000 }; // progressive backoff
+        const int            maxRetries           = 5;
+
+        if(WiFi.status() != WL_CONNECTED) {
+            unsigned long backoff = backoffTimes[min(reconnectAttempts, maxRetries - 1)];
+
+            if(millis() - lastReconnectAttempt > backoff) {
+                Serial.print("WiFi reconnection attempt ");
+                Serial.println(reconnectAttempts + 1);
+                WiFi.reconnect();
+                lastReconnectAttempt = millis();
+                reconnectAttempts++;
+            }
+        } else if(reconnectAttempts > 0) {
+            reconnectAttempts = 0; // Reset on successful connection
+        }
+
 #if defined(USE_OTA)
         ArduinoOTA.handle();
 #endif
