@@ -1,5 +1,6 @@
-#include "core/filesystem.h"
 #include "core/mqtt.h"
+
+#include "core/filesystem.h"
 
 namespace core::mqtt {
     struct mqtt_credentials {
