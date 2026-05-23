@@ -1,6 +1,7 @@
+#include "flow_meter.h"
+
 #include "core/core.h"
 #include "core/time.h"
-#include "flow_meter.h"
 
 #include <Arduino.h>
 
@@ -81,8 +82,8 @@ namespace modules {
 
 // update mqtt
 #ifdef USE_MQTT
-        this->mqtt_vol->update(volumeLast24H, true);
-        this->mqtt_flow->update(userLoopFlowRate, true);
+        this->mqtt_vol->update(volumeLast24H);
+        this->mqtt_flow->update(userLoopFlowRate);
 #endif
 
         // Serial.printf(

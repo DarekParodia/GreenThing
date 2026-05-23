@@ -17,13 +17,14 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <string>
+#include <time.h>
 
 #define disp core::display::displayInterface
 
-modules::Button     button("button1", 0, false, true);
-modules::Solenoid   solenoid("solenoid1", 16, 14, false, 250);
-modules::FlowMeter  flow_meter("flow_meter1", 13);
-modules::Humidity   humidity("humidity1", A0, true, 0, 1024);
+modules::Button    button("button1", 0, false, true);
+modules::Solenoid  solenoid("solenoid1", 16, 14, false, 250);
+modules::FlowMeter flow_meter("flow_meter1", 13);
+// modules::Humidity   humidity("humidity1", A0, true, 0, 1024);
 modules::RCWL_1x05 *ultrasonic = new modules::RCWL_1x05("rcwl1x05");
 modules::AHT20      aht20("AHT20");
 
@@ -39,30 +40,71 @@ byte char_litersPerMinute[] = {
     B10001
 };
 
-bool         prevButton                                = false;
-int          currentVolMeasurment                      = -1;
-double       currentVolume                             = 0.0;
+bool         prevButton                             = false;
+int          currentVolMeasurment                   = -1;
+double       currentVolume                          = 0.0;
 
-const double containerVolume                           = 1000.0; // Liters
-const double containerHeight                           = 100.0;  // Centimeter
+const double containerVolume                        = 1000.0; // Liters
+const double containerHeight                        = 100.0;  // Centimeter
 
 // SAFETY
-double                         maxLiters               = 10.0;
-const double                   secondsAfterCloseCheck  = 15.0;
-const double                   secondsPerCloseTry      = 7.5;
-const double                   flowTreshold            = 5.0;
-bool                           _alarm                  = false;
+double                    maxLiters                 = 10.0;
+const double              secondsAfterCloseCheck    = 15.0;
+const double              secondsPerCloseTry        = 7.5;
+const double              flowTreshold              = 5.0;
+bool                      _alarm                    = false;
 
-unsigned long                  lastValveClose          = 0;
-unsigned long                  lastValveCloseTry       = 0;
-double                         closingFlow             = 0;
+unsigned long             lastValveClose            = 0;
+unsigned long             lastValveCloseTry         = 0;
+double                    closingFlow               = 0;
 
-bool                           prevSolenoid            = false;
+bool                      prevSolenoid              = false;
+bool                      solenoid_desired          = false;
+bool                      solenoid_last_desired     = false;
+bool                      solenoid_last_actual      = false;
 
-core::mqtt::hass_data          hd                      = { "volume_alarm_water_volume", "L", "water" };
+double                    tank_level_percent        = 0.0;
+double                    tank_level_liters         = 0.0;
+double                    daily_water_used          = 0.0;
+double                    uptime_seconds            = 0.0;
+double                    wifi_rssi_dbm             = 0.0;
+time_t                    last_watering_start_epoch = 0;
+time_t                    last_watering_end_epoch   = 0;
+double                    seconds_since_watering    = 0.0;
 
-core::mqtt::mqtt_data<double> *mqtt_volume_alarm       = new core::mqtt::mqtt_data<double>("volume_alarm/value", &maxLiters);
-core::mqtt::mqtt_data<double> *mqtt_volume_alarm_water = new core::mqtt::mqtt_data<double>("volume_alarm/water_volume", 1000, hd);
+core::mqtt::EntityMeta    volume_alarm_meta         = { "Max Water Per Cycle", "L", "" };
+core::mqtt::EntityMeta    volume_alarm_water_meta   = { "Water Used This Cycle", "L", "water" };
+core::mqtt::NumberConfig  volume_alarm_config       = { true, true, true, 1.0f, 20.0f, 0.1f, HANumber::ModeSlider, false, false };
+
+core::mqtt::NumberInput  *mqtt_volume_alarm         = new core::mqtt::NumberInput("volume_alarm_value", &maxLiters, volume_alarm_meta, volume_alarm_config);
+core::mqtt::SensorNumber *mqtt_volume_alarm_water   = new core::mqtt::SensorNumber("volume_alarm_water_volume", 1000, volume_alarm_water_meta);
+
+core::mqtt::EntityMeta    solenoid_meta             = { "Watering Valve", "", "switch", "mdi:valve" };
+core::mqtt::Switch       *mqtt_solenoid_switch      = new core::mqtt::Switch("watering_valve", &solenoid_desired, solenoid_meta);
+
+core::mqtt::EntityMeta    tank_level_pct_meta       = { "Tank Level", "%", "", "mdi:water-percent" };
+core::mqtt::EntityMeta    tank_level_l_meta         = { "Tank Level", "L", "water", "mdi:water" };
+core::mqtt::SensorNumber *mqtt_tank_level_pct       = new core::mqtt::SensorNumber("tank_level_percent", 5000, tank_level_pct_meta);
+core::mqtt::SensorNumber *mqtt_tank_level_liters    = new core::mqtt::SensorNumber("tank_level_liters", 5000, tank_level_l_meta);
+
+core::mqtt::EntityMeta    daily_water_meta          = { "Water Used Today", "L", "water", "mdi:water" };
+core::mqtt::SensorNumber *mqtt_daily_water          = new core::mqtt::SensorNumber("water_used_today", 10000, daily_water_meta);
+
+core::mqtt::EntityMeta    flow_alarm_meta           = { "Flow Alarm", "", "problem", "mdi:alert" };
+core::mqtt::BinarySensor *mqtt_flow_alarm           = new core::mqtt::BinarySensor("flow_alarm", &_alarm, flow_alarm_meta);
+
+core::mqtt::EntityMeta    wifi_rssi_meta            = { "WiFi Signal", "dBm", "signal_strength", "mdi:wifi" };
+core::mqtt::SensorNumber *mqtt_wifi_rssi            = new core::mqtt::SensorNumber("wifi_rssi", 10000, wifi_rssi_meta);
+
+core::mqtt::EntityMeta    uptime_meta               = { "Power On Duration", "s", "", "mdi:timer" };
+core::mqtt::SensorNumber *mqtt_uptime               = new core::mqtt::SensorNumber("uptime_seconds", 10000, uptime_meta);
+
+core::mqtt::EntityMeta    last_start_meta           = { "Last Watering Start", "", "", "mdi:clock-start" };
+core::mqtt::EntityMeta    last_end_meta             = { "Last Watering End", "", "", "mdi:clock-end" };
+core::mqtt::EntityMeta    last_elapsed_meta         = { "Seconds Since Last Watering", "s", "", "mdi:clock-outline" };
+core::mqtt::SensorText   *mqtt_last_start           = new core::mqtt::SensorText("last_watering_start", last_start_meta);
+core::mqtt::SensorText   *mqtt_last_end             = new core::mqtt::SensorText("last_watering_end", last_end_meta);
+core::mqtt::SensorNumber *mqtt_last_elapsed         = new core::mqtt::SensorNumber("seconds_since_last_watering", 10000, last_elapsed_meta);
 
 // s
 void alarm() {
@@ -95,16 +137,32 @@ double getUsVolume() {
 }
 // For my personal use case. It calculates water level percentage based on distance to water surface from the top of container
 
+static std::string formatEpoch(time_t epoch) {
+    if(epoch < 100000)
+        return "unknown";
+    struct tm timeinfo;
+    if(!localtime_r(&epoch, &timeinfo))
+        return "unknown";
+    char buf[32] = { 0 };
+    if(strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeinfo) == 0)
+        return "unknown";
+    return std::string(buf);
+}
+
 void wateringCycleOn() {
     currentVolume = 0.0;
     solenoid.open();
+    last_watering_start_epoch = time(nullptr);
+    mqtt_last_start->update(formatEpoch(last_watering_start_epoch), true);
 }
 
 void wateringCycleOff() {
     closingFlow = flow_meter.getFlowRate();
     solenoid.close();
     button.setState(false);
-    lastValveClose = millis();
+    lastValveClose          = millis();
+    last_watering_end_epoch = time(nullptr);
+    mqtt_last_end->update(formatEpoch(last_watering_end_epoch), true);
 }
 core::timeout_t *timeout = nullptr;
 
@@ -130,6 +188,14 @@ namespace client {
     }
 
     void loop() {
+        if(solenoid_desired != solenoid_last_desired) {
+            if(solenoid_desired)
+                wateringCycleOn();
+            else
+                wateringCycleOff();
+            solenoid_last_desired = solenoid_desired;
+        }
+
         if(button.isPressed() != prevButton) {
             prevButton = button.isPressed();
 
@@ -141,6 +207,32 @@ namespace client {
 
         ultrasonic->setTemperature(aht20.getTemperature());
         alarmCheck();
+
+        tank_level_percent = getUsPercentage() * 100.0;
+        tank_level_liters  = getUsVolume();
+        daily_water_used   = flow_meter.getVolume24H();
+        uptime_seconds     = millis() / 1000.0;
+        wifi_rssi_dbm      = core::wifi::isConnected() ? WiFi.RSSI() : 0.0;
+        if(last_watering_end_epoch >= 100000) {
+            time_t now = time(nullptr);
+            if(now >= last_watering_end_epoch)
+                seconds_since_watering = difftime(now, last_watering_end_epoch);
+        }
+
+        mqtt_tank_level_pct->update(tank_level_percent);
+        mqtt_tank_level_liters->update(tank_level_liters);
+        mqtt_daily_water->update(daily_water_used);
+        mqtt_wifi_rssi->update(wifi_rssi_dbm);
+        mqtt_uptime->update(uptime_seconds);
+        mqtt_last_elapsed->update(seconds_since_watering);
+        mqtt_flow_alarm->update();
+
+        if(solenoid.isOpen() != solenoid_last_actual) {
+            solenoid_last_actual  = solenoid.isOpen();
+            solenoid_desired      = solenoid_last_actual;
+            solenoid_last_desired = solenoid_last_actual;
+            mqtt_solenoid_switch->setState(solenoid_last_actual);
+        }
 
         // backlight
         // if (solenoid.isOpen() != prevSolenoid){

@@ -26,10 +26,10 @@ namespace modules {
             bool          debounce();
             unsigned long lastDebounceTime = 0;  // Last time the button state was toggled
             unsigned long debounceDelay    = 10; // Debounce time in milliseconds
-            int           mqtt_state;
+            bool          mqtt_state       = false;
 #ifdef USE_MQTT
-            core::mqtt::hass_data       hd        = { core::mqtt::HassType::SWITCH, Module::getName() + "_state", "", "switch" };
-            core::mqtt::mqtt_data<int> *mqtt_data = new core::mqtt::mqtt_data<int>(Module::getName() + "/state", &mqtt_state, hd);
+            core::mqtt::EntityMeta mqtt_meta   = { Module::getName() + " State", "", "switch" };
+            core::mqtt::Switch    *mqtt_switch = new core::mqtt::Switch(Module::getName() + "_state", &mqtt_state, mqtt_meta);
 #endif
     };
 } // namespace modules

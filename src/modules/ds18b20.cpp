@@ -24,7 +24,7 @@ namespace modules {
         this->trigger();
         this->measure();
 #ifdef USE_MQTT
-        Temperature::mqtt_data->update(this->temperature, true);
+        Temperature::mqtt_sensor->update(this->temperature);
 #endif
     }
 

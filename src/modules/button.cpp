@@ -42,7 +42,7 @@ namespace modules {
         this->state = state;
         mqtt_state  = state;
 #ifdef USE_MQTT
-        mqtt_data->update(mqtt_state);
+        mqtt_switch->setState(mqtt_state);
 #endif
     }
 

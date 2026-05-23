@@ -64,10 +64,10 @@ namespace modules {
             std::vector<double *> volumeMeasurments;
 
 #ifdef USE_MQTT
-            core::mqtt::hass_data          hd_flow   = { Module::getName() + "_flow", "L/min", "volume_flow_rate" };
-            core::mqtt::hass_data          hd_vol    = { Module::getName() + "_volume", "L", "water" };
-            core::mqtt::mqtt_data<double> *mqtt_flow = new core::mqtt::mqtt_data<double>(Module::getName() + "/flow", 1000, hd_flow);
-            core::mqtt::mqtt_data<double> *mqtt_vol  = new core::mqtt::mqtt_data<double>(Module::getName() + "/volume", 1000, hd_vol);
+            core::mqtt::EntityMeta    mqtt_meta_flow = { Module::getName() + " Flow", "L/min", "volume_flow_rate" };
+            core::mqtt::EntityMeta    mqtt_meta_vol  = { Module::getName() + " Volume", "L", "water" };
+            core::mqtt::SensorNumber *mqtt_flow      = new core::mqtt::SensorNumber(Module::getName() + "_flow", 1000, mqtt_meta_flow);
+            core::mqtt::SensorNumber *mqtt_vol       = new core::mqtt::SensorNumber(Module::getName() + "_volume", 1000, mqtt_meta_vol);
 #endif
 
             void registerPulse();

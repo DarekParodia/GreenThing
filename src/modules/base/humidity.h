@@ -26,8 +26,8 @@ namespace modules {
             double humidity  = 0.0; // Current humidity value in percentage
 
 #ifdef USE_MQTT
-            core::mqtt::hass_data          hd        = { Module::getName() + "_humidity", "%", "humidity" };
-            core::mqtt::mqtt_data<double> *mqtt_data = new core::mqtt::mqtt_data<double>(Module::getName() + "/humidity", 10000, hd);
+            core::mqtt::EntityMeta    mqtt_meta   = { Module::getName() + " Humidity", "%", "humidity" };
+            core::mqtt::SensorNumber *mqtt_sensor = new core::mqtt::SensorNumber(Module::getName() + "_humidity", 10000, mqtt_meta);
 #endif
     };
 } // namespace modules

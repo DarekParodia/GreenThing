@@ -39,8 +39,8 @@ namespace modules {
         this->measure();
         this->trigger();
 #ifdef USE_MQTT
-        Temperature::mqtt_data->update(this->temperature, true);
-        Humidity::mqtt_data->update(this->humidity, true);
+        Temperature::mqtt_sensor->update(this->temperature);
+        Humidity::mqtt_sensor->update(this->humidity);
 #endif
     }
     void AHT20::trigger() {
