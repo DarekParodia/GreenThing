@@ -17,12 +17,28 @@ namespace modules {
     AHT20::~AHT20() {}
 
     void AHT20::init() {
-        this->failed = false;
+        this->failed  = false;
         // Check if AHT20 responds on I2C address 0x38
-        Wire.beginTransmission(0x38);
-        uint8_t error = Wire.endTransmission();
-        if(error != 0)
+        // Wire.beginTransmission(0x38);
+        // uint8_t error = Wire.endTransmission();
+        // if(error != 0) {
+        //     this->failed = true;
+        //     Serial.println("AHT20 sensor initialization failed! Sensor not found at address 0x38.");
+        // }
+
+        uint8_t error = 0;
+        for(int i = 0; i < 3; ++i) {
+            error = Wire.endTransmission();
+            if(error == 0) break; // Sensor found, exit loop
+            delay(1000);          // Wait before retrying
+        }
+
+        if(error != 0) {
             this->failed = true;
+            Serial.println("AHT20 sensor initialization failed! Sensor not found at address 0x38 after multiple attempts.");
+        } else {
+            Serial.println("AHT20 sensor initialized successfully.");
+        }
     }
 
     void AHT20::loop() {
